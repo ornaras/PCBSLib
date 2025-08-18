@@ -80,22 +80,27 @@ namespace PCBS
             {
                 foreach (var com in SerialPort.GetPortNames())
                 {
-                    PCBSDevice dev = null;
-                    var success = false;
-                    try
-                    {
-                        dev = new PCBSDevice(com);
-                        var resp = dev.Send("8000011");
-                        success = resp == "8000011\x06.";
-                    }
-                    catch (Exception e)
-                    {
-                        dev?.Dispose();
-                        Logging?.Invoke(e.ToString());
-                        success = false;
-                    }
-                    if (success) yield return dev;
+                    var dev = TryConnectCOM(com);
+                    if (!(dev is null)) 
+                        yield return dev;
                 }
+            }
+        }
+
+        private static PCBSDevice TryConnectCOM(string port)
+        {
+            PCBSDevice dev = null;
+            try
+            {
+                dev = new PCBSDevice(port);
+                var resp = dev.Send("8000011");
+                return resp == "8000011\x06." ? dev : null;
+            }
+            catch (Exception e)
+            {
+                dev?.Dispose();
+                Logging?.Invoke(e.ToString());
+                return null;
             }
         }
     }

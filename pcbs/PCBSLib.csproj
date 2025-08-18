@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>ornaras</Authors>
+	<RootNamespace>PCBS</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

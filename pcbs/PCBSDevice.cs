@@ -9,10 +9,11 @@ namespace PCBS
     public partial class PCBSDevice : IDisposable
     {
         public string Address { get; private set; }
+        public PCBSConnTypes ConnType => 
+            Address.StartsWith("COM") ? PCBSConnTypes.COM : PCBSConnTypes.HID;
 
         private bool disposed = true;
         private Stream _stream;
-        private bool _isComPort;
         private SerialPort _port;
 
         public static event Action<string> Logging;
@@ -20,9 +21,8 @@ namespace PCBS
         public PCBSDevice(string address)
         {
             disposed = false;
-            if (address.StartsWith("COM"))
+            if (ConnType == PCBSConnTypes.COM)
             {
-                _isComPort = true;
                 _port = new SerialPort(address);
                 _port.Open();
                 _stream = _port.BaseStream;
@@ -35,9 +35,9 @@ namespace PCBS
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             command = $"M\x0D{command}.";
-            var data = new byte[_isComPort ? 1 + command.Length : 64];
+            var data = new byte[ConnType == PCBSConnTypes.COM ? 1 + command.Length : 64];
             var encoding = Encoding.UTF8;
-            if (_isComPort)
+            if (ConnType == PCBSConnTypes.COM)
             {
                 data[0] = 255;
                 encoding.GetBytes(command).CopyTo(data, 1);
@@ -74,25 +74,28 @@ namespace PCBS
             disposed = true;
         }
 
-        public static IEnumerable<PCBSDevice> Discover()
+        public static IEnumerable<PCBSDevice> Discover(PCBSConnTypes filter = (PCBSConnTypes)3)
         {
-            foreach(var com in SerialPort.GetPortNames())
+            if (filter.HasFlag(PCBSConnTypes.COM))
             {
-                PCBSDevice dev = null;
-                var success = false;
-                try
+                foreach (var com in SerialPort.GetPortNames())
                 {
-                    dev = new PCBSDevice(com);
-                    var resp = dev.Send("8000011");
-                    success = resp == "8000011\x06.";
+                    PCBSDevice dev = null;
+                    var success = false;
+                    try
+                    {
+                        dev = new PCBSDevice(com);
+                        var resp = dev.Send("8000011");
+                        success = resp == "8000011\x06.";
+                    }
+                    catch (Exception e)
+                    {
+                        dev?.Dispose();
+                        Logging?.Invoke(e.ToString());
+                        success = false;
+                    }
+                    if (success) yield return dev;
                 }
-                catch(Exception e)
-                {
-                    dev?.Dispose();
-                    Logging?.Invoke(e.ToString());
-                    success = false;
-                }
-                if(success) yield return dev;
             }
         }
     }

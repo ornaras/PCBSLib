@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HidSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
@@ -8,27 +9,35 @@ namespace PCBS
 {
     public partial class PCBSDevice : IDisposable
     {
-        public string Address { get; private set; }
-        public PCBSConnTypes ConnType => 
-            Address.StartsWith("COM") ? PCBSConnTypes.COM : PCBSConnTypes.HID;
+        public PCBSConnTypes ConnType { get; private set; }
 
         private bool disposed = true;
         private Stream _stream;
         private SerialPort _port;
+        private HidDevice _hid;
 
         public static event Action<string> Logging;
 
-        public PCBSDevice(string address)
+        public PCBSDevice(string port)
         {
+            ConnType = PCBSConnTypes.COM;
             disposed = false;
-            if (ConnType == PCBSConnTypes.COM)
-            {
-                _port = new SerialPort(address);
-                _port.Open();
-                _stream = _port.BaseStream;
-            }
+            _port = new SerialPort(port);
+            _port.Open();
+            _stream = _port.BaseStream;
             _stream.WriteTimeout = _stream.ReadTimeout = 5000;
-            Address = address;
+        }
+
+        public PCBSDevice(int vid, int pid, int release, string serial) : 
+            this(DeviceList.Local.GetHidDeviceOrNull(vid, pid, release, serial)) { }
+
+        private PCBSDevice(HidDevice device)
+        {
+            ConnType = PCBSConnTypes.HID;
+            disposed = false;
+            _hid = device;
+            _stream = _hid.Open();
+            _stream.WriteTimeout = _stream.ReadTimeout = 5000;
         }
 
         public string Send(string command, int respSize = 64)
@@ -42,11 +51,25 @@ namespace PCBS
                 data[0] = 255;
                 encoding.GetBytes(command).CopyTo(data, 1);
             }
+            else if (ConnType == PCBSConnTypes.HID)
+            {
+                data[0] = 0xFD;
+                data[1] = 0x0B;
+                data[2] = 0xFF;
+                encoding.GetBytes(command).CopyTo(data, 3);
+            }
             _stream.Write(data, 0, data.Length);
             data = new byte[respSize];
             var count = _stream.Read(data, 0, data.Length);
-            if (count != data.Length) Array.Resize(ref data, count);
-            return encoding.GetString(data);
+            var resp = encoding.GetString(data);
+            resp = resp.Replace("\0", "");
+            return ConnType == PCBSConnTypes.HID ? resp.Substring(2) : resp;
+        }
+
+        public override string ToString()
+        {
+            if (disposed) return "";
+            return ConnType == PCBSConnTypes.COM ? _port.PortName : _hid.DevicePath;
         }
 
         public void Dispose()
@@ -85,6 +108,15 @@ namespace PCBS
                         yield return dev;
                 }
             }
+            if (filter.HasFlag(PCBSConnTypes.HID))
+            {
+                foreach(var hid in DeviceList.Local.GetHidDevices())
+                {
+                    var dev = TryConnectHID(hid);
+                    if (!(dev is null))
+                        yield return dev;
+                }
+            }
         }
 
         private static PCBSDevice TryConnectCOM(string port)
@@ -99,6 +131,23 @@ namespace PCBS
             catch (Exception e)
             {
                 dev?.Dispose();
+                Logging?.Invoke(e.ToString());
+                return null;
+            }
+        }
+
+        private static PCBSDevice TryConnectHID(HidDevice dev)
+        {
+            PCBSDevice _dev = null;
+            try
+            {
+                _dev = new PCBSDevice(dev);
+                var resp = _dev.Send("8000011");
+                return resp == "8000011\x06." ? _dev : null;
+            }
+            catch (Exception e)
+            {
+                _dev?.Dispose();
                 Logging?.Invoke(e.ToString());
                 return null;
             }

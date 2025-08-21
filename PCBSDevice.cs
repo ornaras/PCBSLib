@@ -10,14 +10,17 @@ namespace PCBS
 {
     public partial class PCBSDevice : IDisposable
     {
-        public PCBSConnTypes ConnType
+        [Flags]
+        public enum ConnTypes : byte { COM = 1, HID = 2 }
+
+        public ConnTypes ConnType
         {
             get
             {
                 switch (_dev)
                 {
-                    case HidDevice _: return PCBSConnTypes.HID;
-                    case SerialDevice _: return PCBSConnTypes.COM;
+                    case HidDevice _: return ConnTypes.HID;
+                    case SerialDevice _: return ConnTypes.COM;
                     default: return 0;
                 }
             }
@@ -48,14 +51,14 @@ namespace PCBS
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             command = $"M\x0D{command}.";
-            var data = new byte[ConnType == PCBSConnTypes.COM ? 1 + command.Length : 64];
+            var data = new byte[ConnType == ConnTypes.COM ? 1 + command.Length : 64];
             var encoding = Encoding.UTF8;
-            if (ConnType == PCBSConnTypes.COM)
+            if (ConnType == ConnTypes.COM)
             {
                 data[0] = 255;
                 encoding.GetBytes(command).CopyTo(data, 1);
             }
-            else if (ConnType == PCBSConnTypes.HID)
+            else if (ConnType == ConnTypes.HID)
             {
                 data[0] = 0xFD;
                 data[1] = (byte)(1 + command.Length);
@@ -66,7 +69,7 @@ namespace PCBS
             data = new byte[respSize];
             switch (ConnType)
             {
-                case PCBSConnTypes.COM:
+                case ConnTypes.COM:
                     try
                     {
                         for (var i = 0; i < respSize; i++)
@@ -78,13 +81,13 @@ namespace PCBS
                     }
                     catch (TimeoutException) { break; }
                     break;
-                case PCBSConnTypes.HID:
+                case ConnTypes.HID:
                     _ = _stream.Read(data, 0, data.Length);
                     break;
             }
             var resp = encoding.GetString(data);
             resp = resp.Replace("\0", "");
-            if (ConnType == PCBSConnTypes.HID) 
+            if (ConnType == ConnTypes.HID) 
                 resp = resp.Substring(2);
             var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
             return match.Groups["resp"].Value;
@@ -120,9 +123,9 @@ namespace PCBS
             disposed = true;
         }
 
-        public static IEnumerable<PCBSDevice> Discover(PCBSConnTypes filter = (PCBSConnTypes)3)
+        public static IEnumerable<PCBSDevice> Discover(ConnTypes filter = (ConnTypes)3)
         {
-            if (filter.HasFlag(PCBSConnTypes.COM))
+            if (filter.HasFlag(ConnTypes.COM))
             {
                 foreach (var com in DeviceList.Local.GetSerialDevices())
                 {
@@ -131,7 +134,7 @@ namespace PCBS
                         yield return dev;
                 }
             }
-            if (filter.HasFlag(PCBSConnTypes.HID))
+            if (filter.HasFlag(ConnTypes.HID))
             {
                 foreach(var hid in DeviceList.Local.GetHidDevices())
                 {

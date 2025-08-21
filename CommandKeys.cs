@@ -412,6 +412,699 @@
         public const int MAX_LENGHT_MATRIX2OF2 = 907002;
         #endregion
 
+        #region CODE11
+        /// <summary>
+        /// Сброс всех настроек для CODE11
+        /// </summary>
+        public const int RESET_CODE11 = 908000;
+        /// <summary>
+        /// Считывание CODE11<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODE11 = 908002;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODE11 = 908004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODE11 = 908003;
+        /// <summary>
+        /// Количество контрольных символов<br/><br/>
+        /// Значения:<br/>
+        /// 0 - 1 символ<br/>
+        /// 1 - 2 символа
+        /// </summary>
+        public const int READING_HASH_SYMBOL_CODE11 = 311028;
+        #endregion
+
+        #region CODE128
+        /// <summary>
+        /// Сброс всех настроек для CODE128
+        /// </summary>
+        public const int RESET_CODE128 = 909000;
+        /// <summary>
+        /// Считывание CODE128<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODE128 = 909001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODE128 = 909003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODE128 = 909002;
+        /// <summary>
+        /// Объедиение CODE128<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить<br/>
+        /// </summary>
+        public const int UNION_CODE128 = 902005;
+        #endregion
+
+        #region GS1-128
+        /// <summary>
+        /// Сброс всех настроек для GS1-128
+        /// </summary>
+        public const int RESET_GS128 = 910000;
+        /// <summary>
+        /// Считывание GS1-128<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_GS128 = 910001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_GS128 = 910003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_GS128 = 910002;
+        #endregion
+
+        #region Telepen
+        /// <summary>
+        /// Сброс всех настроек для Telepen
+        /// </summary>
+        public const int RESET_TELEPEN = 911000;
+        /// <summary>
+        /// Считывание Telepen<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TELEPEN = 911001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_TELEPEN = 911003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_TELEPEN = 910002;
+        #endregion
+
+        #region UPC-A
+        /// <summary>
+        /// Сброс всех настроек для UPC-A
+        /// </summary>
+        public const int RESET_UPCA = 912000;
+        /// <summary>
+        /// Считывание UPC-A<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_UPCA = 912003;
+        /// <summary>
+        /// Разделитель между данными из UPC-A и доп. блоком<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_SPLITTER_UPCA = 912007;
+        /// <summary>
+        /// Контрольный символ<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_UPCA = 912004;
+        /// <summary>
+        /// Передача 2-ух цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON2_UPCA = 912001;
+        /// <summary>
+        /// Передача 5 цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON5_UPCA = 912002;
+        /// <summary>
+        /// Режим сканирования UPC-A без доп. блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Разрешить сканирование без доп.блоков<br/>
+        /// 1 - Игнорировать коды без доп.блоков
+        /// </summary>
+        public const int IS_ENABLED_IGNORE_WOUT_ADDON_UPCA = 912006;
+        /// <summary>
+        /// Преобразование в EAN-13<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CONVERT_TO_EAN13_UPCA = 912011;
+        /// <summary>
+        /// Передача преамбулы<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_PREAMBULE_UPCA = 912005;
+        #endregion
+
+        #region UPC-E
+        /// <summary>
+        /// Сброс всех настроек для UPC-E0
+        /// </summary>
+        public const int RESET_UPCE0 = 914000;
+        /// <summary>
+        /// Считывание UPC-E0<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_UPCE0 = 914010;
+        /// <summary>
+        /// Считывание UPC-E1<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_UPCE1 = 914009;
+        /// <summary>
+        /// Разделитель между данными из UPC-E и доп. блоком<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_SPLITTER_UPCE = 914004;
+        /// <summary>
+        /// Контрольный символ<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_UPCE = 914005;
+        /// <summary>
+        /// Передача 2-ух цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON2_UPCE = 914007;
+        /// <summary>
+        /// Передача 5 цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON5_UPCE = 914008;
+        /// <summary>
+        /// Режим сканирования UPC-E без доп. блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Разрешить сканирование без доп.блоков<br/>
+        /// 1 - Игнорировать коды без доп.блоков
+        /// </summary>
+        public const int IS_ENABLED_IGNORE_WOUT_ADDON_UPCE = 914003;
+        /// <summary>
+        /// Передача преамбулы<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_PREAMBULE_UPCE = 914006;
+        /// <summary>
+        /// Расширение UPC-E до 12 символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_EXTENSION12_UPCE = 914002;
+        #endregion
+
+        #region EAN-13
+        /// <summary>
+        /// Сброс всех настроек для EAN-13
+        /// </summary>
+        public const int RESET_EAN13 = 915000;
+        /// <summary>
+        /// Считывание EAN-13<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_EAN13 = 915001;
+        /// <summary>
+        /// Разделитель между данными из EAN-13 и доп. блоком<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_SPLITTER_EAN13 = 915006;
+        /// <summary>
+        /// Контрольный символ<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_EAN13 = 915002;
+        /// <summary>
+        /// Передача 2-ух цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON2_EAN13 = 915003;
+        /// <summary>
+        /// Передача 5 цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON5_EAN13 = 915004;
+        /// <summary>
+        /// Режим сканирования EAN-13 без доп. блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Разрешить сканирование без доп.блоков<br/>
+        /// 1 - Игнорировать коды без доп.блоков
+        /// </summary>
+        public const int IS_ENABLED_IGNORE_WOUT_ADDON_EAN13 = 915005;
+        /// <summary>
+        /// Преобразование в формат ISBN<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CONVERT_TO_ISBN_EAN13 = 915007;
+        #endregion
+
+        #region EAN-8
+        /// <summary>
+        /// Сброс всех настроек для EAN-8
+        /// </summary>
+        public const int RESET_EAN8 = 916000;
+        /// <summary>
+        /// Считывание EAN-8<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_EAN8 = 916001;
+        /// <summary>
+        /// Разделитель между данными из EAN-8 и доп. блоком<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_SPLITTER_EAN8 = 916006;
+        /// <summary>
+        /// Контрольный символ<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_EAN8 = 916002;
+        /// <summary>
+        /// Передача 2-ух цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON2_EAN8 = 916003;
+        /// <summary>
+        /// Передача 5 цифр из дополнительного блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_TRANSFER_ADDON5_EAN8 = 916004;
+        /// <summary>
+        /// Режим сканирования EAN-8 без доп. блока<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Разрешить сканирование без доп.блоков<br/>
+        /// 1 - Игнорировать коды без доп.блоков
+        /// </summary>
+        public const int IS_ENABLED_IGNORE_WOUT_ADDON_EAN8 = 916005;
+        #endregion
+
+        #region MSI
+        /// <summary>
+        /// Сброс всех настроек для MSI
+        /// </summary>
+        public const int RESET_MSI = 917000;
+        /// <summary>
+        /// Считывание MSI<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_MSI = 917001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_MSI = 917004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_MSI = 917003;
+        /// <summary>
+        /// Режим работы с контрольным символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Подтверждать контрольный символ MOD 10 
+        /// без передачи на хост<br/>
+        /// 1 - Подтверждать контрольный символ MOD 10 
+        /// и передать его на хост<br/>
+        /// 6 - Отключить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_MSI = 917002;
+        #endregion
+
+        #region GS1 DataBar Omnidirectional
+        /// <summary>
+        /// Сброс всех настроек для GS1 DataBar Omnidirectional
+        /// </summary>
+        public const int RESET_GS1O = 918000;
+        /// <summary>
+        /// Считывание GS1 DataBar Omnidirectional<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_GS1O = 918001;
+        #endregion
+
+        #region GS1 DataBar Limited
+        /// <summary>
+        /// Сброс всех настроек для GS1 DataBar Limited
+        /// </summary>
+        public const int RESET_GS1L = 919000;
+        /// <summary>
+        /// Считывание GS1 DataBar Limited<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_GS1L = 919001;
+        #endregion
+
+        #region GS1 DataBar Expanded
+        /// <summary>
+        /// Сброс всех настроек для GS1 DataBar Expanded
+        /// </summary>
+        public const int RESET_GS1E = 920000;
+        /// <summary>
+        /// Считывание GS1 DataBar Expanded<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_GS1E = 920001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_GS1E = 920003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_GS1E = 920002;
+        #endregion
+
+        #region PDF417
+        /// <summary>
+        /// Сброс всех настроек для PDF417
+        /// </summary>
+        public const int RESET_PDF417 = 924000;
+        /// <summary>
+        /// Считывание PDF417<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_PDF417 = 924001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_PDF417 = 924003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_PDF417 = 924002;
+        #endregion
+
+        #region QR
+        /// <summary>
+        /// Сброс всех настроек для QR
+        /// </summary>
+        public const int RESET_QR = 928000;
+        /// <summary>
+        /// Считывание QR<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_QR = 928001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_QR = 928003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_QR = 928002;
+        #endregion
+
+        #region Data Matrix
+        /// <summary>
+        /// Сброс всех настроек для Data Matrix
+        /// </summary>
+        public const int RESET_DATAMATRIX = 930000;
+        /// <summary>
+        /// Считывание Data Matrix<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_DATAMATRIX = 930001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_DATAMATRIX = 930003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_DATAMATRIX = 930002;
+        #endregion
+
+        #region Aztec Code
+        /// <summary>
+        /// Сброс всех настроек для Aztec Code
+        /// </summary>
+        public const int RESET_AZTECCODE = 931000;
+        /// <summary>
+        /// Считывание Aztec Code<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_AZTECCODE = 931001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_AZTECCODE = 931003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_AZTECCODE = 931002;
+        #endregion
+
+        #region China Post
+        /// <summary>
+        /// Сброс всех настроек для China Post
+        /// </summary>
+        public const int RESET_CHINAPOST = 936000;
+        /// <summary>
+        /// Считывание China Post<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CHINAPOST = 936001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CHINAPOST = 936003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CHINAPOST = 936002;
+        #endregion
+
+        #region Korea Post
+        /// <summary>
+        /// Сброс всех настроек для Korea Post
+        /// </summary>
+        public const int RESET_KOREAPOST = 937000;
+        /// <summary>
+        /// Считывание Korea Post<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_KOREAPOST = 937001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_KOREAPOST = 937003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_KOREAPOST = 937002;
+        /// <summary>
+        /// Контрольный символ<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HASH_SYMBOL_KOREAPOST = 937004;
+        #endregion
+
+        #region Han Xin Code
+        /// <summary>
+        /// Сброс всех настроек для Han Xin Code
+        /// </summary>
+        public const int RESET_HANXINCODE = 907000;
+        /// <summary>
+        /// Считывание Han Xin Code<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_HANXINCODE = 907001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_HANXINCODE = 907003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_HANXINCODE = 907002;
+        #endregion
+
+        #region Maxi Code
+        /// <summary>
+        /// Сброс всех настроек для Maxi Code
+        /// </summary>
+        public const int RESET_MAXICODE = 929000;
+        /// <summary>
+        /// Считывание Maxi Code<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_MAXICODE = 929001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_MAXICODE = 929003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_MAXICODE = 929002;
+        #endregion
+
+        #region MicroPDF
+        /// <summary>
+        /// Сброс всех настроек для MicroPDF
+        /// </summary>
+        public const int RESET_MICROPDF = 925000;
+        /// <summary>
+        /// Считывание MicroPDF<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_MICROPDF = 925001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_MICROPDF = 925003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_MICROPDF = 925002;
+        #endregion
+
+        #region Composites
+        /// <summary>
+        /// Сброс всех настроек для Composites
+        /// </summary>
+        public const int RESET_COMPOSITES = 926000;
+        /// <summary>
+        /// Считывание Composites<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_COMPOSITES = 926001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_COMPOSITES = 926004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_COMPOSITES = 926003;
+        #endregion
+
+        #region Codablock A
+        /// <summary>
+        /// Сброс всех настроек для Codablock A
+        /// </summary>
+        public const int RESET_CODABLOCKA = 922000;
+        /// <summary>
+        /// Считывание Codablock A<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODABLOCKA = 922001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODABLOCKA = 922003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODABLOCKA = 922002;
+        #endregion
+
+        #region Codablock F
+        /// <summary>
+        /// Сброс всех настроек для Codablock F
+        /// </summary>
+        public const int RESET_CODABLOCKF = 923000;
+        /// <summary>
+        /// Считывание Codablock F<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODABLOCKF = 923001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODABLOCKF = 923003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODABLOCKF = 923002;
+        #endregion
+
         #endregion
     }
 }

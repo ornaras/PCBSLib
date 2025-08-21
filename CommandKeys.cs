@@ -75,7 +75,7 @@
         /// 1 - Отключить<br/>
         /// 0 - Включить
         /// </summary>
-        public const int IS_ENABLED_TRANSFER_GS_CHARACTERS = 887001;
+        public const int IS_ENABLED_TRANSFER_GS_SYMBOLS = 887001;
         #endregion
 
         #region Звук и индикация
@@ -146,6 +146,272 @@
         /// 1 - Включить
         /// </summary>
         public const int IS_ENABLED_SUCCESS_LED = 841008;
+        #endregion
+
+        #region Штрих-коды
+
+        #region CODABAR
+        /// <summary>
+        /// Сброс всех настроек для CODABAR
+        /// </summary>
+        public const int RESET_CODABAR = 900000;
+        /// <summary>
+        /// Считывание CODABAR<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODABAR = 900003;
+        /// <summary>
+        /// Передача старт/стоп символов<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_BORDER_SYMBOLS_CODABAR = 900006;
+        /// <summary>
+        /// Режим работы с контрольным символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Чтение без контрольного символа<br/>
+        /// 1 - Чтение только с контрольными символами без 
+        /// передачи контрольного символа<br/>
+        /// 2 - Чтение только с контрольным символом и его передачей
+        /// </summary>
+        public const int READING_HASH_SYMBOL_CODABAR = 900001;
+        /// <summary>
+        /// Режим работы объедиения CODABAR<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить<br/>
+        /// 2 - Требовать парный символ D
+        /// </summary>
+        public const int UNION_CODABAR = 900002;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODABAR = 900005;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODABAR = 900004;
+        #endregion
+
+        #region CODE39
+        /// <summary>
+        /// Сброс всех настроек для CODE39
+        /// </summary>
+        public const int RESET_CODE39 = 901000;
+        /// <summary>
+        /// Считывание CODE39<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODE39 = 901001;
+        /// <summary>
+        /// Передача старт/стоп символов<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_BORDER_SYMBOLS_CODE39 = 901009;
+        /// <summary>
+        /// Режим работы с контрольным символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Чтение без контрольного символа<br/>
+        /// 1 - Чтение только с контрольными символами без 
+        /// передачи контрольного символа<br/>
+        /// 2 - Чтение только с контрольным символом и его передачей
+        /// </summary>
+        public const int READING_HASH_SYMBOL_CODE39 = 901004;
+        /// <summary>
+        /// Режим работы объедиения CODE39<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int UNION_CODE39 = 901002;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODE39 = 901008;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODE39 = 901007;
+        /// <summary>
+        /// Считывание CODE32<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODE32 = 901005;
+        /// <summary>
+        /// FULL ASCII для CODE39<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_FULL_ASCII_CODE39 = 901003;
+        #endregion
+
+        #region Interleaved 2 of 5
+        /// <summary>
+        /// Сброс всех настроек для Interleaved 2 of 5
+        /// </summary>
+        public const int RESET_INTERLEAVED2OF5 = 902000;
+        /// <summary>
+        /// Считывание Interleaved 2 of 5<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_INTERLEAVED2OF5 = 902002;
+        /// <summary>
+        /// Режим работы с контрольным символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Чтение без контрольного символа<br/>
+        /// 1 - Чтение только с контрольными символами без 
+        /// передачи контрольного символа<br/>
+        /// 2 - Чтение только с контрольным символом и его передачей
+        /// </summary>
+        public const int READING_HASH_SYMBOL_INTERLEAVED2OF5 = 902001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_INTERLEAVED2OF5 = 902004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_INTERLEAVED2OF5 = 902003;
+        #endregion
+
+        #region NEC 2 of 5
+        /// <summary>
+        /// Сброс всех настроек для NEC 2 of 5
+        /// </summary>
+        public const int RESET_NEC2OF5 = 903000;
+        /// <summary>
+        /// Считывание NEC 2 of 5<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_NEC2OF5 = 903001;
+        /// <summary>
+        /// Режим работы с контрольным символом<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Чтение без контрольного символа<br/>
+        /// 1 - Чтение только с контрольными символами без 
+        /// передачи контрольного символа<br/>
+        /// 2 - Чтение только с контрольным символом и его передачей
+        /// </summary>
+        public const int READING_HASH_SYMBOL_NEC2OF5 = 903002;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_NEC2OF5 = 903004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_NEC2OF5 = 903003;
+        #endregion
+
+        #region CODE93
+        /// <summary>
+        /// Сброс всех настроек для CODE93
+        /// </summary>
+        public const int RESET_CODE93 = 904000;
+        /// <summary>
+        /// Считывание CODE93<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_CODE93 = 904002;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_CODE93 = 904004;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_CODE93 = 904003;
+        #endregion
+
+        #region Straight 2 of 5 Industrial
+        /// <summary>
+        /// Сброс всех настроек для Straight 2 of 5 Industrial
+        /// </summary>
+        public const int RESET_STRAIGHT2OF5INDUSTRIAL = 905000;
+        /// <summary>
+        /// Считывание Straight 2 of 5 Industrial<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_STRAIGHT2OF5INDUSTRIAL = 905001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_STRAIGHT2OF5INDUSTRIAL = 905003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_STRAIGHT2OF5INDUSTRIAL = 905002;
+        #endregion
+
+        #region Straight 2 of 5 IATA
+        /// <summary>
+        /// Сброс всех настроек для Straight 2 of 5 IATA
+        /// </summary>
+        public const int RESET_STRAIGHT2OF5IATA = 906000;
+        /// <summary>
+        /// Считывание Straight 2 of 5 IATA<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_STRAIGHT2OF5IATA = 906001;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_STRAIGHT2OF5IATA = 906003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_STRAIGHT2OF5IATA = 906002;
+        #endregion
+
+        #region Matrix 2 of 2
+        /// <summary>
+        /// Сброс всех настроек для Matrix 2 of 2
+        /// </summary>
+        public const int RESET_MATRIX2OF2 = 907000;
+        /// <summary>
+        /// Считывание Matrix 2 of 2<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int IS_ENABLED_MATRIX2OF2 = 907001;
+        /// <summary>
+        /// Контрольным символом Matrix 2 of 2<br/><br/>
+        /// Значения:<br/>
+        /// 0 - Отключить<br/>
+        /// 1 - Включить
+        /// </summary>
+        public const int READING_HASH_SYMBOL_MATRIX2OF2 = 907005;
+        /// <summary>
+        /// Минимальная длина пакета символов
+        /// </summary>
+        public const int MIN_LENGHT_MATRIX2OF2 = 907003;
+        /// <summary>
+        /// Максимальную длина пакета символов
+        /// </summary>
+        public const int MAX_LENGHT_MATRIX2OF2 = 907002;
+        #endregion
+
         #endregion
     }
 }

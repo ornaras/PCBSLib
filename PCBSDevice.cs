@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 
 namespace PCBS
@@ -17,23 +18,26 @@ namespace PCBS
         private HidDevice _hid;
 
         public static event Action<string> Logging;
+        public string Address { get; private set; }
 
-        public PCBSDevice(string port)
+        public PCBSDevice(string hidDevicePath) :
+            this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath == hidDevicePath)) { }
+
+        public PCBSDevice(int comPort)
         {
             ConnType = PCBSConnTypes.COM;
+            Address = $"COM{comPort}";
             disposed = false;
-            _port = new SerialPort(port);
+            _port = new SerialPort(Address);
             _port.Open();
             _stream = _port.BaseStream;
             _stream.WriteTimeout = _stream.ReadTimeout = 5000;
         }
 
-        public PCBSDevice(int vid, int pid, int release, string serial) : 
-            this(DeviceList.Local.GetHidDeviceOrNull(vid, pid, release, serial)) { }
-
         private PCBSDevice(HidDevice device)
         {
             ConnType = PCBSConnTypes.HID;
+            Address = device.DevicePath;
             disposed = false;
             _hid = device;
             _stream = _hid.Open();
@@ -124,6 +128,7 @@ namespace PCBS
             PCBSDevice dev = null;
             try
             {
+                var numb = int.Parse(port.Substring(3));
                 dev = new PCBSDevice(port);
                 var resp = dev.Send("8000011");
                 return resp == "8000011\x06." ? dev : null;

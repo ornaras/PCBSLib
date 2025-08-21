@@ -58,7 +58,7 @@ namespace PCBS
             else if (ConnType == PCBSConnTypes.HID)
             {
                 data[0] = 0xFD;
-                data[1] = 0x0B;
+                data[1] = (byte)(1 + command.Length);
                 data[2] = 0xFF;
                 encoding.GetBytes(command).CopyTo(data, 3);
             }

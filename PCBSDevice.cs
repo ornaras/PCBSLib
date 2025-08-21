@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,38 +10,38 @@ namespace PCBS
 {
     public partial class PCBSDevice : IDisposable
     {
-        public PCBSConnTypes ConnType { get; private set; }
+        public PCBSConnTypes ConnType
+        {
+            get
+            {
+                switch (_dev)
+                {
+                    case HidDevice _: return PCBSConnTypes.HID;
+                    case SerialDevice _: return PCBSConnTypes.COM;
+                    default: return 0;
+                }
+            }
+        }
 
         private bool disposed = true;
         private Stream _stream;
-        private SerialPort _port;
-        private HidDevice _hid;
+        private Device _dev;
 
         public static event Action<string> Logging;
-        public string Address { get; private set; }
+        public string Address => _dev.DevicePath.Substring(4);
 
         public PCBSDevice(string hidDevicePath) :
-            this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath == hidDevicePath)) { }
+            this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath.EndsWith(hidDevicePath))) { }
 
-        public PCBSDevice(int comPort)
-        {
-            ConnType = PCBSConnTypes.COM;
-            Address = $"COM{comPort}";
-            disposed = false;
-            _port = new SerialPort(Address);
-            _port.Open();
-            _stream = _port.BaseStream;
-            _stream.WriteTimeout = _stream.ReadTimeout = 5000;
-        }
+        public PCBSDevice(int comPort) :
+            this(DeviceList.Local.GetSerialDeviceOrNull($"COM{comPort}")) { }
 
-        private PCBSDevice(HidDevice device)
+        private PCBSDevice(Device device)
         {
-            ConnType = PCBSConnTypes.HID;
-            Address = device.DevicePath;
             disposed = false;
-            _hid = device;
-            _stream = _hid.Open();
-            _stream.WriteTimeout = _stream.ReadTimeout = 5000;
+            _dev = device;
+            _stream = _dev.Open();
+            _stream.WriteTimeout = _stream.ReadTimeout = 1000;
         }
 
         public string Send(string command, int respSize = 64)
@@ -65,23 +64,36 @@ namespace PCBS
             }
             _stream.Write(data, 0, data.Length);
             data = new byte[respSize];
-            var count = _stream.Read(data, 0, data.Length);
+            switch (ConnType)
+            {
+                case PCBSConnTypes.COM:
+                    try
+                    {
+                        for (var i = 0; i < respSize; i++)
+                        {
+
+                            var @byte = _stream.ReadByte();
+                            data[i] = (byte)@byte;
+                        }
+                    }
+                    catch (TimeoutException) { break; }
+                    break;
+                case PCBSConnTypes.HID:
+                    _ = _stream.Read(data, 0, data.Length);
+                    break;
+            }
             var resp = encoding.GetString(data);
             resp = resp.Replace("\0", "");
             if (ConnType == PCBSConnTypes.HID) 
                 resp = resp.Substring(2);
-            var match = Regex.Match(resp, @"^\d+:? ?(?<resp>.+)\u0006\.?$");
+            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
             return match.Groups["resp"].Value;
         }
 
         public string Set(int address, string value) => Send($"{address}{value}");
         public string Get(int address) => Send($"{address}?");
 
-        public override string ToString()
-        {
-            if (disposed) return "";
-            return ConnType == PCBSConnTypes.COM ? _port.PortName : _hid.DevicePath;
-        }
+        public override string ToString() => disposed ? "" : Address;
 
         public void Dispose()
         {
@@ -101,8 +113,8 @@ namespace PCBS
                 if (disposing)
                 {
                     _stream?.Dispose();
-                    _port?.Close();
-                    _port?.Dispose();
+                    _stream = null;
+                    _dev = null;
                 }
             }
             disposed = true;
@@ -112,9 +124,9 @@ namespace PCBS
         {
             if (filter.HasFlag(PCBSConnTypes.COM))
             {
-                foreach (var com in SerialPort.GetPortNames())
+                foreach (var com in DeviceList.Local.GetSerialDevices())
                 {
-                    var dev = TryConnectCOM(com);
+                    var dev = TryConnect(com);
                     if (!(dev is null)) 
                         yield return dev;
                 }
@@ -123,32 +135,14 @@ namespace PCBS
             {
                 foreach(var hid in DeviceList.Local.GetHidDevices())
                 {
-                    var dev = TryConnectHID(hid);
+                    var dev = TryConnect(hid);
                     if (!(dev is null))
                         yield return dev;
                 }
             }
         }
 
-        private static PCBSDevice TryConnectCOM(string port)
-        {
-            PCBSDevice dev = null;
-            try
-            {
-                var numb = int.Parse(port.Substring(3));
-                dev = new PCBSDevice(port);
-                var resp = dev.Set(800001, "1");
-                return resp == "1" ? dev : null;
-            }
-            catch (Exception e)
-            {
-                dev?.Dispose();
-                Logging?.Invoke(e.ToString());
-                return null;
-            }
-        }
-
-        private static PCBSDevice TryConnectHID(HidDevice dev)
+        private static PCBSDevice TryConnect(Device dev)
         {
             PCBSDevice _dev = null;
             try

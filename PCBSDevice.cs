@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PCBS
 {
@@ -67,7 +68,10 @@ namespace PCBS
             var count = _stream.Read(data, 0, data.Length);
             var resp = encoding.GetString(data);
             resp = resp.Replace("\0", "");
-            return ConnType == PCBSConnTypes.HID ? resp.Substring(2) : resp;
+            if (ConnType == PCBSConnTypes.HID) 
+                resp = resp.Substring(2);
+            var match = Regex.Match(resp, @"^\d+:? ?(?<resp>.+)\u0006\.?$");
+            return match.Groups["resp"].Value;
         }
 
         public string Set(int address, string value) => Send($"{address}{value}");
@@ -133,8 +137,8 @@ namespace PCBS
             {
                 var numb = int.Parse(port.Substring(3));
                 dev = new PCBSDevice(port);
-                var resp = dev.Send("8000011");
-                return resp == "8000011\x06." ? dev : null;
+                var resp = dev.Set(800001, "1");
+                return resp == "1" ? dev : null;
             }
             catch (Exception e)
             {
@@ -150,8 +154,8 @@ namespace PCBS
             try
             {
                 _dev = new PCBSDevice(dev);
-                var resp = _dev.Send("8000011");
-                return resp == "8000011\x06." ? _dev : null;
+                var resp = _dev.Set(800001, "1");
+                return resp == "1" ? _dev : null;
             }
             catch (Exception e)
             {

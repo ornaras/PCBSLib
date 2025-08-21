@@ -70,6 +70,9 @@ namespace PCBS
             return ConnType == PCBSConnTypes.HID ? resp.Substring(2) : resp;
         }
 
+        public string Set(int address, string value) => Send($"{address}{value}");
+        public string Get(int address) => Send($"{address}?");
+
         public override string ToString()
         {
             if (disposed) return "";

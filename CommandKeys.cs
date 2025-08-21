@@ -1,6 +1,6 @@
 ﻿namespace PCBS
 {
-    public ref struct CommandKey
+    public static class CommandKey
     {
         #region Заводские настройки
         /// <summary>

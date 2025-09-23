@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Authors>ornaras</Authors>
 		<RootNamespace>PCBS</RootNamespace>
-		<Version>2.0</Version>
+		<Version>2.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/ornaras/PCBSLib</RepositoryUrl>
 		<IncludeSymbols>True</IncludeSymbols>

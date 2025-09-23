@@ -123,25 +123,19 @@ namespace PCBS
             disposed = true;
         }
 
-        public static IEnumerable<PCBSDevice> Discover(ConnTypes filter = (ConnTypes)3)
+        public static IEnumerable<PCBSDevice> Discover()
         {
-            if (filter.HasFlag(ConnTypes.COM))
+            foreach (var com in DeviceList.Local.GetSerialDevices())
             {
-                foreach (var com in DeviceList.Local.GetSerialDevices())
-                {
-                    var dev = TryConnect(com);
-                    if (!(dev is null)) 
-                        yield return dev;
-                }
+                var dev = TryConnect(com);
+                if (!(dev is null)) 
+                    yield return dev;
             }
-            if (filter.HasFlag(ConnTypes.HID))
+            foreach(var hid in DeviceList.Local.GetHidDevices())
             {
-                foreach(var hid in DeviceList.Local.GetHidDevices())
-                {
-                    var dev = TryConnect(hid);
-                    if (!(dev is null))
-                        yield return dev;
-                }
+                var dev = TryConnect(hid);
+                if (!(dev is null))
+                    yield return dev;
             }
         }
 

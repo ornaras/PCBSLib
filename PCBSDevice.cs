@@ -125,17 +125,13 @@ namespace PCBS
 
         public static IEnumerable<PCBSDevice> Discover()
         {
-            foreach (var com in DeviceList.Local.GetSerialDevices())
+            var devList = DeviceList.Local;
+            var devFilter = new DeviceFilter(d => d is HidDevice || d is SerialDevice);
+            var devices = devList.GetAllDevices(devFilter);
+            foreach (var dev in devices)
             {
-                var dev = TryConnect(com);
-                if (!(dev is null)) 
-                    yield return dev;
-            }
-            foreach(var hid in DeviceList.Local.GetHidDevices())
-            {
-                var dev = TryConnect(hid);
-                if (!(dev is null))
-                    yield return dev;
+                if (TryConnect(dev) is PCBSDevice pcbs) 
+                    yield return pcbs;
             }
         }
 

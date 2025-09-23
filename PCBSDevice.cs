@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace PCBS
 {
+    public delegate object GetLocker(string path);
     public partial class PCBSDevice : IDisposable
     {
         [Flags]
@@ -123,20 +125,23 @@ namespace PCBS
             disposed = true;
         }
 
-        public static IEnumerable<PCBSDevice> Discover()
+        public static IEnumerable<PCBSDevice> Discover(GetLocker getLocker = null)
         {
             var devList = DeviceList.Local;
             var devFilter = new DeviceFilter(d => d is HidDevice || d is SerialDevice);
             var devices = devList.GetAllDevices(devFilter);
             foreach (var dev in devices)
             {
-                if (TryConnect(dev) is PCBSDevice pcbs) 
+                if (TryConnect(dev, getLocker) is PCBSDevice pcbs) 
                     yield return pcbs;
             }
         }
 
-        private static PCBSDevice TryConnect(Device dev)
+        private static PCBSDevice TryConnect(Device dev, GetLocker getLocker)
         {
+            var locker = getLocker?.Invoke(dev.DevicePath);
+            if (!(locker is null))
+                Monitor.Enter(locker);
             PCBSDevice _dev = null;
             try
             {
@@ -149,6 +154,11 @@ namespace PCBS
                 _dev?.Dispose();
                 Logging?.Invoke(e.ToString());
                 return null;
+            }
+            finally
+            {
+                if (!(locker is null))
+                    Monitor.Exit(locker);
             }
         }
     }

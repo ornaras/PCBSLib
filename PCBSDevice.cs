@@ -1,4 +1,6 @@
-﻿using HidSharp;
+﻿#pragma warning disable S101
+
+using HidSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,10 +11,22 @@ using System.Threading;
 
 namespace PCBS
 {
+    /// <summary>
+    /// Метод получения объекта для синхронизации потоков
+    /// </summary>
+    /// <param name="path">Адрес устройства</param>
+    /// <returns>Объект для синхронизации потоков</returns>
     public delegate object GetLocker(string path);
-    public partial class PCBSDevice : IDisposable
+
+    /// <summary>
+    /// Класс для управления сканерами POScenter SQ-90C, SQ-100C и SG-100C
+    /// </summary>
+    public class PCBSDevice : IDisposable
     {
         #region Свойства
+        /// <summary>
+        /// Адрес сканера
+        /// </summary>
         public string Address => _dev.DevicePath.Substring(4);
         #endregion
 
@@ -23,9 +37,17 @@ namespace PCBS
         #endregion
 
         #region Конструкторы
+        /// <summary>
+        /// Конструктор класс для управления сканером в режиме USB-HID
+        /// </summary>
+        /// <param name="hidDevicePath">Путь к HID-устройству</param>
         public PCBSDevice(string hidDevicePath) :
             this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath.EndsWith(hidDevicePath))) { }
 
+        /// <summary>
+        /// Конструктор класс для управления сканером в режиме USB-COM
+        /// </summary>
+        /// <param name="comPort">COM-порт к устройству</param>
         public PCBSDevice(int comPort) :
             this(DeviceList.Local.GetSerialDeviceOrNull($"COM{comPort}")) { }
 
@@ -85,6 +107,17 @@ namespace PCBS
         #endregion
 
         #region Публичные методы обмена данными
+
+        /// <summary>
+        /// Выполнение команды
+        /// </summary>
+        /// <param name="command">Команда типа Send, Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <param name="respSize">Размер ответа сканера</param>
+        /// <returns>Ответ на выполнение команды</returns>
+        /// <remarks>
+        /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
+        /// </remarks>
+        /// 
         public string Send(string command, int respSize = 64)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
@@ -95,8 +128,20 @@ namespace PCBS
                 default: throw new NotSupportedException();
             }
         }
-        public string Set(int address, string value) => Send($"{address}{value}");
-        public string Get(int address) => Send($"{address}?");
+
+        /// <summary>
+        /// Установка значения команды
+        /// </summary>
+        /// <param name="command">Команда типа Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <returns>Присвоенное значение команды</returns>
+        public string Set(int command, string value) => Send($"{command}{value}");
+
+        /// <summary>
+        /// Получить текущее значение команды
+        /// </summary>
+        /// <param name="command">Команда типа Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <returns>Значение команды</returns>
+        public string Get(int command) => Send($"{command}?");
         #endregion
 
         public override string ToString() => disposed ? "" : Address;
@@ -129,6 +174,11 @@ namespace PCBS
         #endregion
 
         #region Статические методы
+        /// <summary>
+        /// Поиск подключенных сканеров
+        /// </summary>
+        /// <param name="getLocker"></param>
+        /// <returns>Перечисленние найденных сканеров</returns>
         public static IEnumerable<PCBSDevice> Discover(GetLocker getLocker = null)
         {
             var devList = DeviceList.Local;

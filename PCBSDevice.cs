@@ -12,23 +12,7 @@ namespace PCBS
     public delegate object GetLocker(string path);
     public partial class PCBSDevice : IDisposable
     {
-        [Flags]
-        public enum ConnTypes : byte { COM = 1, HID = 2 }
-
-        public ConnTypes ConnType
-        {
-            get
-            {
-                switch (_dev)
-                {
-                    case HidDevice _: return ConnTypes.HID;
-                    case SerialDevice _: return ConnTypes.COM;
-                    default: return 0;
-                }
-            }
-        }
-
-        private bool disposed = true;
+        private bool disposed;
         private Stream _stream;
         private Device _dev;
 
@@ -49,50 +33,59 @@ namespace PCBS
             _stream.WriteTimeout = _stream.ReadTimeout = 1000;
         }
 
+        private string SerialSend(string command, int respSize)
+        {
+            var data = new byte[4 + command.Length];
+            var encoding = Encoding.ASCII;
+            data[0] = 0xFF;
+            data[1] = 0x4D;
+            data[2] = 0x0D;
+            data[data.Length - 1] = 0x2E;
+            encoding.GetBytes(command).CopyTo(data, 3);
+            _stream.Write(data, 0, data.Length);
+            data = new byte[respSize];
+            try
+            {
+                for (var i = 0; i < respSize; i++)
+                {
+                    var @byte = _stream.ReadByte();
+                    data[i] = (byte)@byte;
+                }
+            }
+            catch (TimeoutException) { }
+            var resp = encoding.GetString(data).Replace("\0", "");
+            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
+            return match.Groups["resp"].Value;
+        }
+
+        private string HidSend(string command, int respSize)
+        {
+            var data = new byte[64];
+            var encoding = Encoding.UTF8;
+            data[0] = 0xFD;
+            data[1] = (byte)(1 + command.Length);
+            data[2] = 0xFF;
+            data[3] = 0x4D;
+            data[4] = 0x0D;
+            data[command.Length + 5] = 0x2E;
+            encoding.GetBytes(command).CopyTo(data, 5);
+            _stream.Write(data, 0, data.Length);
+            data = new byte[respSize];
+            _ = _stream.Read(data, 0, data.Length);
+            var resp = encoding.GetString(data).Replace("\0", "").Substring(2);
+            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
+            return match.Groups["resp"].Value;
+        }
+
         public string Send(string command, int respSize = 64)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
-            command = $"M\x0D{command}.";
-            var data = new byte[ConnType == ConnTypes.COM ? 1 + command.Length : 64];
-            var encoding = Encoding.UTF8;
-            if (ConnType == ConnTypes.COM)
+            switch (_dev)
             {
-                data[0] = 255;
-                encoding.GetBytes(command).CopyTo(data, 1);
+                case SerialDevice _: return SerialSend(command, respSize);
+                case HidDevice _: return HidSend(command, respSize);
+                default: throw new NotSupportedException();
             }
-            else if (ConnType == ConnTypes.HID)
-            {
-                data[0] = 0xFD;
-                data[1] = (byte)(1 + command.Length);
-                data[2] = 0xFF;
-                encoding.GetBytes(command).CopyTo(data, 3);
-            }
-            _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            switch (ConnType)
-            {
-                case ConnTypes.COM:
-                    try
-                    {
-                        for (var i = 0; i < respSize; i++)
-                        {
-
-                            var @byte = _stream.ReadByte();
-                            data[i] = (byte)@byte;
-                        }
-                    }
-                    catch (TimeoutException) { break; }
-                    break;
-                case ConnTypes.HID:
-                    _ = _stream.Read(data, 0, data.Length);
-                    break;
-            }
-            var resp = encoding.GetString(data);
-            resp = resp.Replace("\0", "");
-            if (ConnType == ConnTypes.HID) 
-                resp = resp.Substring(2);
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
         }
 
         public string Set(int address, string value) => Send($"{address}{value}");
@@ -121,8 +114,8 @@ namespace PCBS
                     _stream = null;
                     _dev = null;
                 }
+                disposed = true;
             }
-            disposed = true;
         }
 
         public static IEnumerable<PCBSDevice> Discover(GetLocker getLocker = null)

@@ -12,13 +12,17 @@ namespace PCBS
     public delegate object GetLocker(string path);
     public partial class PCBSDevice : IDisposable
     {
+        #region Свойства
+        public string Address => _dev.DevicePath.Substring(4);
+        #endregion
+
+        #region Переменные
         private bool disposed;
         private Stream _stream;
         private Device _dev;
+        #endregion
 
-        public static event Action<string> Logging;
-        public string Address => _dev.DevicePath.Substring(4);
-
+        #region Конструкторы
         public PCBSDevice(string hidDevicePath) :
             this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath.EndsWith(hidDevicePath))) { }
 
@@ -32,7 +36,9 @@ namespace PCBS
             _stream = _dev.Open();
             _stream.WriteTimeout = _stream.ReadTimeout = 1000;
         }
+        #endregion
 
+        #region Внутренние методы обмена данными
         private string SerialSend(string command, int respSize)
         {
             var data = new byte[4 + command.Length];
@@ -76,7 +82,9 @@ namespace PCBS
             var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
             return match.Groups["resp"].Value;
         }
+        #endregion
 
+        #region Публичные методы обмена данными
         public string Send(string command, int respSize = 64)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
@@ -87,12 +95,13 @@ namespace PCBS
                 default: throw new NotSupportedException();
             }
         }
-
         public string Set(int address, string value) => Send($"{address}{value}");
         public string Get(int address) => Send($"{address}?");
+        #endregion
 
         public override string ToString() => disposed ? "" : Address;
 
+        #region Dispose и Деструктор
         public void Dispose()
         {
             Dispose(true);
@@ -104,7 +113,7 @@ namespace PCBS
             Dispose(false);
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
@@ -117,7 +126,9 @@ namespace PCBS
                 disposed = true;
             }
         }
+        #endregion
 
+        #region Статические методы
         public static IEnumerable<PCBSDevice> Discover(GetLocker getLocker = null)
         {
             var devList = DeviceList.Local;
@@ -145,7 +156,6 @@ namespace PCBS
             catch (Exception e)
             {
                 _dev?.Dispose();
-                Logging?.Invoke(e.ToString());
                 return null;
             }
             finally
@@ -154,5 +164,6 @@ namespace PCBS
                     Monitor.Exit(locker);
             }
         }
+        #endregion
     }
 }

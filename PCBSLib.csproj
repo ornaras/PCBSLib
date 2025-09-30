@@ -1,19 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Authors>ornaras</Authors>
 		<RootNamespace>PCBS</RootNamespace>
 		<Version>2.1</Version>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/ornaras/PCBSLib</RepositoryUrl>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputType>Library</OutputType>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net4.7.2</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<UseWindowsForms>true</UseWindowsForms>
+		<PlatformTarget>x86</PlatformTarget>		
 	</PropertyGroup>
 
 	<ItemGroup>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="HidSharp" Version="2.1.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<Compile Remove="MainForm.cs" />
+		<Compile Remove="MainForm.Designer.cs" />
+		<Compile Remove="Program.cs" />
 	</ItemGroup>
 
 </Project>

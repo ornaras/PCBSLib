@@ -214,6 +214,38 @@ namespace PCBS
                     Monitor.Exit(locker);
             }
         }
+
+        public static bool TryConnect(string hidPath, out PCBSDevice device)
+        {
+            try
+            {
+                device = new PCBSDevice(hidPath);
+                if (device.Set(800001, "1") != "1")
+                    throw new Exception();
+            }
+            catch
+            {
+                device = null;
+                return false;
+            }
+            return true;
+        }
+
+        public static bool TryConnect(int comPort, out PCBSDevice device)
+        {
+            try
+            {
+                device = new PCBSDevice(comPort);
+                if (device.Set(800001, "1") != "1")
+                    throw new Exception();
+            }
+            catch
+            {
+                device = null;
+                return false;
+            }
+            return true;
+        }
         #endregion
     }
 }

@@ -28,12 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.general = new PCBS.UserControls.General();
+            this.SuspendLayout();
+            // 
+            // general
+            // 
+            this.general.Location = new System.Drawing.Point(12, 12);
+            this.general.MaximumSize = new System.Drawing.Size(250, 246);
+            this.general.MinimumSize = new System.Drawing.Size(250, 246);
+            this.general.Name = "general";
+            this.general.Size = new System.Drawing.Size(250, 246);
+            this.general.TabIndex = 23;
+            // 
+            // MainForm
+            // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Text = "MainForm";
         }
 
         #endregion
+        private PCBS.UserControls.General general;
     }
 }

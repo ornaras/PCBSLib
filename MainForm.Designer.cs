@@ -42,9 +42,17 @@
             // 
             // MainForm
             // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "MainForm";
+            this.ClientSize = new System.Drawing.Size(888, 449);
+            this.Controls.Add(this.general);
+            this.Controls.Add(this.tabControl1);
+            this.Name = "MainForm";
+            this.ShowIcon = false;
+            this.Text = "Тест бибилиотеки PCBSLib";
+            this.tabControl1.ResumeLayout(false);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

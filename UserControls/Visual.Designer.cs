@@ -206,7 +206,6 @@
             this.Controls.Add(this.nbFrequence);
             this.Controls.Add(this.cbSoundStart);
             this.Name = "Visual";
-            this.Size = new System.Drawing.Size(410, 247);
             ((System.ComponentModel.ISupportInitialize)(this.nbFrequence)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbFrequenceError)).EndInit();
             this.ResumeLayout(false);

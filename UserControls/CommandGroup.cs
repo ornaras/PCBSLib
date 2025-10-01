@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -8,31 +9,49 @@ namespace PCBS.UserControls
     {
         private readonly string[] onDevice;
         private readonly int[] cmds;
+        private readonly int? cmdReset;
 
-        protected CommandGroup(params int[] cmds)
+        protected CommandGroup(int? commandReset, params int[] cmds)
         {
             this.cmds = cmds;
+            cmdReset = commandReset;
             onDevice = new string[cmds.Length];
             RegisterControls();
         }
 
         private void RegisterControls()
         {
-            var btnPush = new Button();
-            var btnPull = new Button();
+            MaximumSize = MinimumSize = new Size(600, 399);
 
-            btnPush.Location = new System.Drawing.Point(84, 3);
-            btnPush.Size = new System.Drawing.Size(75, 23);
-            btnPush.Text = "Записать";
-            btnPush.Click += new EventHandler(Push);
-
-            btnPull.Location = new System.Drawing.Point(3, 3);
-            btnPull.Size = new System.Drawing.Size(75, 23);
-            btnPull.Text = "Считать";
+            var btnPull = new Button
+            {
+                Location = new Point(3, 3),
+                Size = new Size(75, 23),
+                Text = "Считать"
+            };
             btnPull.Click += new EventHandler(Pull);
-
             Controls.Add(btnPull);
+
+            var btnPush = new Button
+            {
+                Location = new Point(84, 3),
+                Size = new Size(75, 23),
+                Text = "Записать"
+            };
+            btnPush.Click += new EventHandler(Push);
             Controls.Add(btnPush);
+
+            if (cmdReset is int)
+            {
+                var btnReset = new Button
+                {
+                    Location = new Point(165, 3),
+                    Size = new Size(125, 23),
+                    Text = "Сбросить настройки"
+                };
+                btnReset.Click += new EventHandler(Reset);
+                Controls.Add(btnReset);
+            }
         }
 
         private Control FindControl(int command) =>
@@ -112,6 +131,12 @@ namespace PCBS.UserControls
                 countChanged++;
             }
             MessageBox.Show($"Успешно обновлено {countChanged} настроек");
+        }
+
+        protected void Reset(object sender, EventArgs e)
+        {
+            MainForm.CurrentConnection?.Get(cmdReset.Value);
+            Pull(sender, e);
         }
     }
 }

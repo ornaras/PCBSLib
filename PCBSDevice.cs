@@ -61,9 +61,9 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private string[] SerialSend(string command, int respSize)
+        private string[] SerialSend(string command)
         {
-            var data = new byte[4 + command.Length];
+            const int DEFAULT_SIZE_RESPONSE = 64;
             var encoding = Encoding.ASCII;
             data[0] = 0xFF;
             data[1] = 0x4D;
@@ -71,7 +71,7 @@ namespace PCBS
             data[data.Length - 1] = 0x2E;
             encoding.GetBytes(command).CopyTo(data, 3);
             _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
+            data = new byte[DEFAULT_SIZE_RESPONSE];
             var readed = 0;
             do
             {
@@ -84,7 +84,7 @@ namespace PCBS
                 }
                 catch (TimeoutException) { }
                 if (data.Length > readed) break;
-                Array.Resize(ref data, data.Length + respSize);
+                Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
             } while (true);
             var resp = encoding.GetString(data).Replace("\0", "");
             var matches = Regex.Matches(resp, @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
@@ -143,13 +143,12 @@ namespace PCBS
         /// <remarks>
         /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
         /// </remarks>
-        /// 
-        public string Send(string command, int respSize = 64)
+        public string Send(string command)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
             {
-                case SerialDevice _: return SerialSend(command, respSize)[0];
+                case SerialDevice _: return SerialSend(command)[0];
                 case HidDevice _: return HidSend(command)[0];
                 default: throw new NotSupportedException();
             }

@@ -274,6 +274,7 @@
             this.MinimumSize = new System.Drawing.Size(250, 246);
             this.Name = "General";
             this.Size = new System.Drawing.Size(250, 246);
+            this.Location = new System.Drawing.Point(10,10);
             this.ResumeLayout(false);
             this.PerformLayout();
 

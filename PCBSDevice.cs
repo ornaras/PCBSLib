@@ -61,7 +61,7 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private string SerialSend(string command, int respSize)
+        private string[] SerialSend(string command, int respSize)
         {
             var data = new byte[4 + command.Length];
             var encoding = Encoding.ASCII;
@@ -72,18 +72,26 @@ namespace PCBS
             encoding.GetBytes(command).CopyTo(data, 3);
             _stream.Write(data, 0, data.Length);
             data = new byte[respSize];
-            try
+            var readed = 0;
+            do
             {
-                for (var i = 0; i < respSize; i++)
+                try { 
+                    for (; readed < data.Length; readed++)
                 {
                     var @byte = _stream.ReadByte();
-                    data[i] = (byte)@byte;
+                        data[readed] = (byte)@byte;
                 }
             }
             catch (TimeoutException) { }
+                if (data.Length > readed) break;
+                Array.Resize(ref data, data.Length + respSize);
+            } while (true);
             var resp = encoding.GetString(data).Replace("\0", "");
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+            var matches = Regex.Matches(resp, @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
+                result[i] = matches[i].Groups["resp"].Value;
+            return result;
         }
 
         private string HidSend(string command, int respSize)
@@ -123,7 +131,7 @@ namespace PCBS
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
             {
-                case SerialDevice _: return SerialSend(command, respSize);
+                case SerialDevice _: return SerialSend(command, respSize)[0];
                 case HidDevice _: return HidSend(command, respSize);
                 default: throw new NotSupportedException();
             }

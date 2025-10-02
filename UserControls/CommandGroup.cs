@@ -63,7 +63,7 @@ namespace PCBS.UserControls
             {
                 case CheckBox check:
                     if (check.CheckState == CheckState.Indeterminate) return null;
-                    return check.CheckState == CheckState.Indeterminate ? null : ("0");
+                    return check.Checked ? "1" : "0";
                 case ComboBox cb: return cb.SelectedIndex == -1 ? null : $"{cb.SelectedIndex}";
                 case NumericUpDown nb: return nb.Value < 0 ? null : $"{nb.Value}";
                 default: throw new NotImplementedException();

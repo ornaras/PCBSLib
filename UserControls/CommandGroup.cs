@@ -111,9 +111,14 @@ namespace PCBS.UserControls
 
         protected void Pull(object sender, EventArgs e)
         {
+            if (MainForm.CurrentConnection is null)
+            {
+                MessageBox.Show("Отсутствует подключение со сканером", "Не удалось выгрузить данные со сканера", 0, MessageBoxIcon.Hand);
+                return;
+            }
             for (var i = 0; i < cmds.Length; i++)
             {
-                onDevice[i] = MainForm.CurrentConnection?.Get(cmds[i]) ?? "";
+                onDevice[i] = MainForm.CurrentConnection.Get(cmds[i]) ?? "";
                 SetCurrentValue(cmds[i], onDevice[i]);
             }
             MessageBox.Show("Считывание завершено");
@@ -121,12 +126,17 @@ namespace PCBS.UserControls
 
         protected void Push(object sender, EventArgs e)
         {
+            if (MainForm.CurrentConnection is null)
+            {
+                MessageBox.Show("Отсутствует подключение со сканером", "Не удалось загрузить данные в сканер", 0, MessageBoxIcon.Hand);
+                return;
+            }
             var countChanged = 0;
             for (var i = 0; i < cmds.Length; i++)
             {
                 var currValue = GetCurrentValue(cmds[i]);
                 if (currValue == onDevice[i]) continue;
-                MainForm.CurrentConnection?.Set(cmds[i], currValue);
+                MainForm.CurrentConnection.Set(cmds[i], currValue);
                 onDevice[i] = currValue;
                 countChanged++;
             }

@@ -77,12 +77,12 @@ namespace PCBS
             {
                 try { 
                     for (; readed < data.Length; readed++)
-                {
-                    var @byte = _stream.ReadByte();
-                        data[readed] = (byte)@byte;
+                    {
+                        var @byte = _stream.ReadByte();
+                            data[readed] = (byte)@byte;
+                    }
                 }
-            }
-            catch (TimeoutException) { }
+                catch (TimeoutException) { }
                 if (data.Length > readed) break;
                 Array.Resize(ref data, data.Length + respSize);
             } while (true);
@@ -94,23 +94,41 @@ namespace PCBS
             return result;
         }
 
-        private string HidSend(string command, int respSize)
+        private string[] HidSend(string command)
         {
-            var data = new byte[64];
-            var encoding = Encoding.UTF8;
+            const int SIZE_ARRAYS = 64;
+            const int COUNT_CHARACTERS = 61;
+            var encoding = Encoding.ASCII;
+            var bytes = new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(command))
+                .Append((byte)0x2E).ToArray();
+            var count = (int)Math.Ceiling(bytes.Length / (double)COUNT_CHARACTERS);
+            var data = new byte[SIZE_ARRAYS];
+            var dataResponse = new StringBuilder();
             data[0] = 0xFD;
-            data[1] = (byte)(1 + command.Length);
-            data[2] = 0xFF;
-            data[3] = 0x4D;
-            data[4] = 0x0D;
-            data[command.Length + 5] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 5);
-            _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            _ = _stream.Read(data, 0, data.Length);
-            var resp = encoding.GetString(data).Replace("\0", "").Substring(2);
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+            for (var y = 0; y < count; y++)
+            {
+                var dataSize = Math.Min(bytes.Length - (y * COUNT_CHARACTERS), COUNT_CHARACTERS);
+                data[1] = (byte)dataSize;
+                data[SIZE_ARRAYS - 1] = (byte)(y == count - 1 ? 0 : 1);
+                for (var i = 0; i <= COUNT_CHARACTERS; i++)
+                    data[i + 2] = 0;
+                for (var x = 0; x < dataSize; x++)
+                    data[x + 2] = bytes[y * COUNT_CHARACTERS + x];
+                _stream.Write(data, 0, data.Length);
+            }
+            do
+            {
+                var _resp = new byte[SIZE_ARRAYS];
+                try { _ = _stream.Read(_resp, 0, SIZE_ARRAYS); }
+                catch (TimeoutException) { break; }
+                dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
+            } while (true);
+            var matches = Regex.Matches(dataResponse.ToString(), @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
+                result[i] = matches[i].Groups["resp"].Value;
+            return result;
         }
         #endregion
 
@@ -132,7 +150,7 @@ namespace PCBS
             switch (_dev)
             {
                 case SerialDevice _: return SerialSend(command, respSize)[0];
-                case HidDevice _: return HidSend(command, respSize);
+                case HidDevice _: return HidSend(command)[0];
                 default: throw new NotSupportedException();
             }
         }

@@ -91,7 +91,7 @@ namespace PCBS
             var data = new byte[64];
             var encoding = Encoding.UTF8;
             data[0] = 0xFD;
-            data[1] = (byte)(1 + command.Length);
+            data[1] = (byte)(4 + command.Length);
             data[2] = 0xFF;
             data[3] = 0x4D;
             data[4] = 0x0D;

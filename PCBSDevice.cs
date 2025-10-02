@@ -65,11 +65,9 @@ namespace PCBS
         {
             const int DEFAULT_SIZE_RESPONSE = 64;
             var encoding = Encoding.ASCII;
-            data[0] = 0xFF;
-            data[1] = 0x4D;
-            data[2] = 0x0D;
-            data[data.Length - 1] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 3);
+            var data = new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(command))
+                .Append((byte)0x2E).ToArray();
             _stream.Write(data, 0, data.Length);
             data = new byte[DEFAULT_SIZE_RESPONSE];
             var readed = 0;
@@ -79,7 +77,7 @@ namespace PCBS
                     for (; readed < data.Length; readed++)
                     {
                         var @byte = _stream.ReadByte();
-                            data[readed] = (byte)@byte;
+                        data[readed] = (byte)@byte;
                     }
                 }
                 catch (TimeoutException) { }

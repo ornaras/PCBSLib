@@ -19,6 +19,8 @@ namespace PCBS.UserControls
             RegisterControls();
         }
 
+        public CommandGroup() => RegisterControls();
+
         private void RegisterControls()
         {
             MaximumSize = MinimumSize = new Size(600, 399);

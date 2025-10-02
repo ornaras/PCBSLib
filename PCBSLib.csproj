@@ -22,17 +22,16 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<PlatformTarget>x86</PlatformTarget>		
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<PackageReference Include="HidSharp" Version="2.1.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
 		<Compile Remove="UserControls\*" />
-		<EmbeddedResource Remove="UserControls\*" />
 		<Compile Remove="MainForm.cs" />
-		<Compile Remove="MainForm.Designer.cs" />
-		<EmbeddedResource Remove="MainForm.resx" />
 		<Compile Remove="Program.cs" />
+		<Compile Remove="UIGenerator.cs" />
 	</ItemGroup>
 
 </Project>

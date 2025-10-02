@@ -1,4 +1,6 @@
-﻿namespace PCBS.UserControls
+﻿using static PCBS.UIGenerator;
+
+namespace PCBS.UserControls
 {
     public partial class Visual : CommandGroup
     {

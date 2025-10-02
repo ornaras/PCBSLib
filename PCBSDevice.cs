@@ -135,10 +135,32 @@ namespace PCBS
         #region Публичные методы обмена данными
 
         /// <summary>
+        /// Выполнение нескольких команд
+        /// </summary>
+        /// <param name="commands">
+        /// Команды типа Send, Get и Get/Set.<br/>
+        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
+        /// </param>
+        /// <returns>Ответы выполнений команд</returns>
+        public string[] MultiSend(string[] commands)
+        {
+            if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
+            switch (_dev)
+            {
+                case SerialDevice _: return SerialSend(string.Join(";", commands));
+                case HidDevice _: return HidSend(string.Join(";", commands));
+                default: throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
         /// Выполнение команды
         /// </summary>
-        /// <param name="command">Команда типа Send, Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
-        /// <param name="respSize">Размер ответа сканера</param>
+        /// <param name="command">
+        /// Команда типа Send, Get и Get/Set.<br/>
+        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
+        /// </param>
+        /// <param name="respSize">Размер ответ сканера</param>
         /// <returns>Ответ на выполнение команды</returns>
         /// <remarks>
         /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.

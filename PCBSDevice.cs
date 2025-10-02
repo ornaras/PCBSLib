@@ -61,70 +61,115 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private string SerialSend(string command, int respSize)
+        private string[] SerialSend(string command)
         {
-            var data = new byte[4 + command.Length];
+            const int DEFAULT_SIZE_RESPONSE = 64;
             var encoding = Encoding.ASCII;
-            data[0] = 0xFF;
-            data[1] = 0x4D;
-            data[2] = 0x0D;
-            data[data.Length - 1] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 3);
+            var data = new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(command))
+                .Append((byte)0x2E).ToArray();
             _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            try
+            data = new byte[DEFAULT_SIZE_RESPONSE];
+            var readed = 0;
+            do
             {
-                for (var i = 0; i < respSize; i++)
-                {
-                    var @byte = _stream.ReadByte();
-                    data[i] = (byte)@byte;
+                try { 
+                    for (; readed < data.Length; readed++)
+                    {
+                        var @byte = _stream.ReadByte();
+                        data[readed] = (byte)@byte;
+                    }
                 }
-            }
-            catch (TimeoutException) { }
+                catch (TimeoutException) { }
+                if (data.Length > readed) break;
+                Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
+            } while (true);
             var resp = encoding.GetString(data).Replace("\0", "");
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+            var matches = Regex.Matches(resp, @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
+                result[i] = matches[i].Groups["resp"].Value;
+            return result;
         }
 
-        private string HidSend(string command, int respSize)
+        private string[] HidSend(string command)
         {
-            var data = new byte[64];
-            var encoding = Encoding.UTF8;
+            const int SIZE_ARRAYS = 64;
+            const int COUNT_CHARACTERS = 61;
+            var encoding = Encoding.ASCII;
+            var bytes = new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(command))
+                .Append((byte)0x2E).ToArray();
+            var count = (int)Math.Ceiling(bytes.Length / (double)COUNT_CHARACTERS);
+            var data = new byte[SIZE_ARRAYS];
+            var dataResponse = new StringBuilder();
             data[0] = 0xFD;
-            data[1] = (byte)(4 + command.Length);
-            data[2] = 0xFF;
-            data[3] = 0x4D;
-            data[4] = 0x0D;
-            data[command.Length + 5] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 5);
-            _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            _ = _stream.Read(data, 0, data.Length);
-            var resp = encoding.GetString(data).Replace("\0", "").Substring(2);
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+            for (var y = 0; y < count; y++)
+            {
+                var dataSize = Math.Min(bytes.Length - (y * COUNT_CHARACTERS), COUNT_CHARACTERS);
+                data[1] = (byte)dataSize;
+                data[SIZE_ARRAYS - 1] = (byte)(y == count - 1 ? 0 : 1);
+                for (var i = 0; i <= COUNT_CHARACTERS; i++)
+                    data[i + 2] = 0;
+                for (var x = 0; x < dataSize; x++)
+                    data[x + 2] = bytes[y * COUNT_CHARACTERS + x];
+                _stream.Write(data, 0, data.Length);
+            }
+            do
+            {
+                var _resp = new byte[SIZE_ARRAYS];
+                try { _ = _stream.Read(_resp, 0, SIZE_ARRAYS); }
+                catch (TimeoutException) { break; }
+                dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
+            } while (true);
+            var matches = Regex.Matches(dataResponse.ToString(), @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
+            var result = new string[matches.Count];
+            for (var i = 0; i < matches.Count; i++)
+                result[i] = matches[i].Groups["resp"].Value;
+            return result;
         }
         #endregion
 
         #region Публичные методы обмена данными
 
         /// <summary>
-        /// Выполнение команды
+        /// Выполнение нескольких команд
         /// </summary>
-        /// <param name="command">Команда типа Send, Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
-        /// <param name="respSize">Размер ответа сканера</param>
-        /// <returns>Ответ на выполнение команды</returns>
-        /// <remarks>
-        /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
-        /// </remarks>
-        /// 
-        public string Send(string command, int respSize = 64)
+        /// <param name="commands">
+        /// Команды типа Send, Get и Get/Set.<br/>
+        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
+        /// </param>
+        /// <returns>Ответы выполнений команд</returns>
+        public string[] MultiSend(string[] commands)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
             {
-                case SerialDevice _: return SerialSend(command, respSize);
-                case HidDevice _: return HidSend(command, respSize);
+                case SerialDevice _: return SerialSend(string.Join(";", commands));
+                case HidDevice _: return HidSend(string.Join(";", commands));
+                default: throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Выполнение команды
+        /// </summary>
+        /// <param name="command">
+        /// Команда типа Send, Get и Get/Set.<br/>
+        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
+        /// </param>
+        /// <param name="respSize">Размер ответ сканера</param>
+        /// <returns>Ответ на выполнение команды</returns>
+        /// <remarks>
+        /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
+        /// </remarks>
+        public string Send(string command)
+        {
+            if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
+            switch (_dev)
+            {
+                case SerialDevice _: return SerialSend(command)[0];
+                case HidDevice _: return HidSend(command)[0];
                 default: throw new NotSupportedException();
             }
         }

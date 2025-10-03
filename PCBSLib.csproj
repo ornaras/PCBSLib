@@ -20,8 +20,13 @@
 		<TargetFramework>net4.7.2</TargetFramework>
 		<OutputType>WinExe</OutputType>
 		<UseWindowsForms>true</UseWindowsForms>
-		<PlatformTarget>x86</PlatformTarget>		
+		<PlatformTarget>x86</PlatformTarget>
+		<ApplicationIcon>res\logo.ico</ApplicationIcon>	
 	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <Content Include="res\logo.ico" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<PackageReference Include="HidSharp" Version="2.1.0" />
@@ -32,6 +37,7 @@
 		<Compile Remove="MainForm.cs" />
 		<Compile Remove="Program.cs" />
 		<Compile Remove="UIGenerator.cs" />
+		<None Remove="res\logo.ico" />
 	</ItemGroup>
 
 </Project>

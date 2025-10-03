@@ -10,10 +10,28 @@
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageIcon>res\logo-NuGet.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="res\logo-ReadMe.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="HidSharp" Version="2.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Update="res\logo-NuGet.png">
+			<Link>res\logo.png</Link>
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 </Project>

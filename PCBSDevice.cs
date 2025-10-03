@@ -34,6 +34,8 @@ namespace PCBS
         private bool disposed;
         private Stream _stream;
         private Device _dev;
+
+        private readonly Encoding encoding = Encoding.ASCII;
         #endregion
 
         #region Конструкторы
@@ -64,10 +66,7 @@ namespace PCBS
         private string[] SerialSend(string command)
         {
             const int DEFAULT_SIZE_RESPONSE = 64;
-            var encoding = Encoding.ASCII;
-            var data = new byte[3] { 0xFF, 0x4D, 0x0D }
-                .Concat(encoding.GetBytes(command))
-                .Append((byte)0x2E).ToArray();
+            var data = GenerateFullRequest(command);
             _stream.Write(data, 0, data.Length);
             data = new byte[DEFAULT_SIZE_RESPONSE];
             var readed = 0;
@@ -96,10 +95,7 @@ namespace PCBS
         {
             const int SIZE_ARRAYS = 64;
             const int COUNT_CHARACTERS = 61;
-            var encoding = Encoding.ASCII;
-            var bytes = new byte[3] { 0xFF, 0x4D, 0x0D }
-                .Concat(encoding.GetBytes(command))
-                .Append((byte)0x2E).ToArray();
+            var bytes = GenerateFullRequest(command);
             var count = (int)Math.Ceiling(bytes.Length / (double)COUNT_CHARACTERS);
             var data = new byte[SIZE_ARRAYS];
             var dataResponse = new StringBuilder();
@@ -128,6 +124,11 @@ namespace PCBS
                 result[i] = matches[i].Groups["resp"].Value;
             return result;
         }
+
+        private byte[] GenerateFullRequest(string req) => 
+            new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(req))
+                .Append((byte)0x2E).ToArray();
         #endregion
 
         #region Публичные методы обмена данными

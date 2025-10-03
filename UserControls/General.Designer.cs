@@ -177,7 +177,7 @@
             this.tbCombinedRequest.Name = "tbCombinedRequest";
             this.tbCombinedRequest.Size = new System.Drawing.Size(155, 20);
             this.tbCombinedRequest.TabIndex = 17;
-            this.tbCombinedRequest.Text = "1";
+            this.tbCombinedRequest.Text = "811005?;809004?";
             // 
             // tbValueRaw
             // 

@@ -71,7 +71,7 @@
             // lblConnection
             // 
             this.lblConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblConnection.Location = new System.Drawing.Point(0, 0);
+            this.lblConnection.Location = new System.Drawing.Point(9, 10);
             this.lblConnection.Name = "lblConnection";
             this.lblConnection.Size = new System.Drawing.Size(250, 20);
             this.lblConnection.TabIndex = 20;
@@ -80,7 +80,7 @@
             // 
             // lblSerial
             // 
-            this.lblSerial.Location = new System.Drawing.Point(0, 76);
+            this.lblSerial.Location = new System.Drawing.Point(9, 86);
             this.lblSerial.Name = "lblSerial";
             this.lblSerial.Size = new System.Drawing.Size(121, 13);
             this.lblSerial.TabIndex = 4;
@@ -89,7 +89,7 @@
             // 
             // lblValueRaw
             // 
-            this.lblValueRaw.Location = new System.Drawing.Point(54, 135);
+            this.lblValueRaw.Location = new System.Drawing.Point(63, 145);
             this.lblValueRaw.Name = "lblValueRaw";
             this.lblValueRaw.Size = new System.Drawing.Size(196, 13);
             this.lblValueRaw.TabIndex = 13;
@@ -98,7 +98,7 @@
             // 
             // tbSerial
             // 
-            this.tbSerial.Location = new System.Drawing.Point(0, 92);
+            this.tbSerial.Location = new System.Drawing.Point(9, 102);
             this.tbSerial.Name = "tbSerial";
             this.tbSerial.ReadOnly = true;
             this.tbSerial.Size = new System.Drawing.Size(121, 20);
@@ -106,7 +106,7 @@
             // 
             // lblFirmware
             // 
-            this.lblFirmware.Location = new System.Drawing.Point(129, 76);
+            this.lblFirmware.Location = new System.Drawing.Point(138, 86);
             this.lblFirmware.Name = "lblFirmware";
             this.lblFirmware.Size = new System.Drawing.Size(121, 13);
             this.lblFirmware.TabIndex = 5;
@@ -115,7 +115,7 @@
             // 
             // lblKeyRaw
             // 
-            this.lblKeyRaw.Location = new System.Drawing.Point(0, 135);
+            this.lblKeyRaw.Location = new System.Drawing.Point(9, 145);
             this.lblKeyRaw.Name = "lblKeyRaw";
             this.lblKeyRaw.Size = new System.Drawing.Size(46, 13);
             this.lblKeyRaw.TabIndex = 12;
@@ -125,7 +125,7 @@
             // lblHeaderRaw
             // 
             this.lblHeaderRaw.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblHeaderRaw.Location = new System.Drawing.Point(0, 115);
+            this.lblHeaderRaw.Location = new System.Drawing.Point(9, 125);
             this.lblHeaderRaw.Name = "lblHeaderRaw";
             this.lblHeaderRaw.Size = new System.Drawing.Size(250, 20);
             this.lblHeaderRaw.TabIndex = 11;
@@ -134,7 +134,7 @@
             // 
             // tbFirmware
             // 
-            this.tbFirmware.Location = new System.Drawing.Point(129, 92);
+            this.tbFirmware.Location = new System.Drawing.Point(138, 102);
             this.tbFirmware.Name = "tbFirmware";
             this.tbFirmware.ReadOnly = true;
             this.tbFirmware.Size = new System.Drawing.Size(121, 20);
@@ -142,7 +142,7 @@
             // 
             // btnGetRawData
             // 
-            this.btnGetRawData.Location = new System.Drawing.Point(45, 177);
+            this.btnGetRawData.Location = new System.Drawing.Point(54, 187);
             this.btnGetRawData.Name = "btnGetRawData";
             this.btnGetRawData.Size = new System.Drawing.Size(89, 23);
             this.btnGetRawData.TabIndex = 14;
@@ -153,7 +153,7 @@
             // lblCombined
             // 
             this.lblCombined.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblCombined.Location = new System.Drawing.Point(0, 203);
+            this.lblCombined.Location = new System.Drawing.Point(9, 213);
             this.lblCombined.Name = "lblCombined";
             this.lblCombined.Size = new System.Drawing.Size(250, 20);
             this.lblCombined.TabIndex = 16;
@@ -162,7 +162,7 @@
             // 
             // btnSetRawData
             // 
-            this.btnSetRawData.Location = new System.Drawing.Point(140, 177);
+            this.btnSetRawData.Location = new System.Drawing.Point(149, 187);
             this.btnSetRawData.Name = "btnSetRawData";
             this.btnSetRawData.Size = new System.Drawing.Size(110, 23);
             this.btnSetRawData.TabIndex = 15;
@@ -172,7 +172,7 @@
             // 
             // tbCombinedRequest
             // 
-            this.tbCombinedRequest.Location = new System.Drawing.Point(0, 226);
+            this.tbCombinedRequest.Location = new System.Drawing.Point(9, 236);
             this.tbCombinedRequest.Name = "tbCombinedRequest";
             this.tbCombinedRequest.Size = new System.Drawing.Size(155, 20);
             this.tbCombinedRequest.TabIndex = 17;
@@ -180,7 +180,7 @@
             // 
             // tbValueRaw
             // 
-            this.tbValueRaw.Location = new System.Drawing.Point(54, 151);
+            this.tbValueRaw.Location = new System.Drawing.Point(63, 161);
             this.tbValueRaw.Name = "tbValueRaw";
             this.tbValueRaw.Size = new System.Drawing.Size(196, 20);
             this.tbValueRaw.TabIndex = 10;
@@ -188,7 +188,7 @@
             // 
             // tbCodeRaw
             // 
-            this.tbCodeRaw.Location = new System.Drawing.Point(0, 151);
+            this.tbCodeRaw.Location = new System.Drawing.Point(9, 161);
             this.tbCodeRaw.MaxLength = 6;
             this.tbCodeRaw.Name = "tbCodeRaw";
             this.tbCodeRaw.Size = new System.Drawing.Size(46, 20);
@@ -198,7 +198,7 @@
             // 
             // btnSendCombined
             // 
-            this.btnSendCombined.Location = new System.Drawing.Point(161, 226);
+            this.btnSendCombined.Location = new System.Drawing.Point(170, 236);
             this.btnSendCombined.Name = "btnSendCombined";
             this.btnSendCombined.Size = new System.Drawing.Size(89, 20);
             this.btnSendCombined.TabIndex = 18;
@@ -212,7 +212,7 @@
             this.cbConnType.Items.AddRange(new object[] {
             "USB-HID",
             "USB-COM"});
-            this.cbConnType.Location = new System.Drawing.Point(0, 23);
+            this.cbConnType.Location = new System.Drawing.Point(9, 33);
             this.cbConnType.Name = "cbConnType";
             this.cbConnType.Size = new System.Drawing.Size(75, 21);
             this.cbConnType.TabIndex = 1;
@@ -222,14 +222,14 @@
             // cbConnPort
             // 
             this.cbConnPort.FormattingEnabled = true;
-            this.cbConnPort.Location = new System.Drawing.Point(85, 23);
+            this.cbConnPort.Location = new System.Drawing.Point(94, 33);
             this.cbConnPort.Name = "cbConnPort";
             this.cbConnPort.Size = new System.Drawing.Size(165, 21);
             this.cbConnPort.TabIndex = 2;
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(140, 50);
+            this.btnConnect.Location = new System.Drawing.Point(149, 60);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(110, 23);
             this.btnConnect.TabIndex = 3;
@@ -239,7 +239,7 @@
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(44, 50);
+            this.btnRefresh.Location = new System.Drawing.Point(53, 60);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(90, 23);
             this.btnRefresh.TabIndex = 8;
@@ -270,11 +270,10 @@
             this.Controls.Add(this.cbConnPort);
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnRefresh);
-            this.MaximumSize = new System.Drawing.Size(250, 246);
-            this.MinimumSize = new System.Drawing.Size(250, 246);
+            this.MaximumSize = new System.Drawing.Size(268, 449);
+            this.MinimumSize = new System.Drawing.Size(268, 449);
             this.Name = "General";
-            this.Size = new System.Drawing.Size(250, 246);
-            this.Location = new System.Drawing.Point(10,10);
+            this.Size = new System.Drawing.Size(268, 449);
             this.ResumeLayout(false);
             this.PerformLayout();
 

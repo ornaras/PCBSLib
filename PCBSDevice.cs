@@ -251,8 +251,9 @@ namespace PCBS
             try
             {
                 _dev = new PCBSDevice(dev);
-                var resp = _dev.Set(800001, "1");
-                return resp == "1" ? _dev : null;
+                if (_dev.Set(800001, "1") != "1")
+                    throw new Exception();
+                return _dev;
             }
             catch (Exception e)
             {

@@ -83,12 +83,7 @@ namespace PCBS
                 if (data.Length > readed) break;
                 Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
             } while (true);
-            var resp = encoding.GetString(data).Replace("\0", "");
-            var matches = Regex.Matches(resp, @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
-            var result = new string[matches.Count];
-            for (var i = 0; i < matches.Count; i++)
-                result[i] = matches[i].Groups["resp"].Value;
-            return result;
+            return SplitResponse(encoding.GetString(data).Replace("\0", ""));
         }
 
         private string[] HidSend(string command)
@@ -118,17 +113,27 @@ namespace PCBS
                 catch (TimeoutException) { break; }
                 dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
             } while (true);
-            var matches = Regex.Matches(dataResponse.ToString(), @"\d{6}:? ?(?<resp>[^\u0006]+)\u0006(;|\.)");
-            var result = new string[matches.Count];
-            for (var i = 0; i < matches.Count; i++)
-                result[i] = matches[i].Groups["resp"].Value;
-            return result;
+            return SplitResponse(dataResponse.ToString());
         }
 
         private byte[] GenerateFullRequest(string req) => 
             new byte[3] { 0xFF, 0x4D, 0x0D }
                 .Concat(encoding.GetBytes(req))
                 .Append((byte)0x2E).ToArray();
+
+        private static string[] SplitResponse(string raw)
+        {
+            if (!raw.EndsWith(".")) throw new FormatException("Ответ не целостен");
+            var responses = raw.Substring(0, raw.Length - 1).Split(';');
+            return responses.Select(r =>
+            {
+                var match = Regex.Match(r, @"^\d{6}:? ?(?<value>[^\u0006]+)\u0006$");
+                if (!match.Success) return "";
+                var value = match.Groups["value"];
+                if (!value.Success || string.IsNullOrWhiteSpace(value.Value)) return "";
+                return value.Value;
+            }).ToArray();
+        }
         #endregion
 
         #region Публичные методы обмена данными

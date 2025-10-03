@@ -57,16 +57,45 @@ namespace PCBS.UserControls
         }
 
         private Control FindControl(int command) =>
-            Controls.OfType<Control>().FirstOrDefault(c => c.Tag is string tag && tag == $"{command}");
+            Controls.OfType<Control>().FirstOrDefault(c => c.Tag is string tag && tag.Length >= 6 && tag.Substring(0, 6) == $"{command}");
+
+        private static string[] GetControlValues(string tag)
+        {
+            var parts = tag.Split(':');
+            if (parts.Length == 1 || string.IsNullOrWhiteSpace(parts[1]))
+                return Array.Empty<string>();
+            else if (parts.Length > 2) throw new FormatException();
+            return parts[1].Split(',');
+        }
+
+        private static (string, string) GetCheckBoxValues(string tag)
+        {
+            var values = GetControlValues(tag);
+            if (values.Length > 2) throw new FormatException();
+            return (values.Length >= 1 ? values[0] : "1", values.Length == 2 ? values[1] : "0");
+        }
+
+        private static string[] GetComboBoxValues(string tag, int size)
+        {
+            var values = GetControlValues(tag);
+            if (values.Length == 0) return null;
+            if (values.Length != size) throw new FormatException();
+            return values;
+        }
 
         private string GetCurrentValue(int command)
         {
             switch (FindControl(command))
             {
                 case CheckBox check:
+                    var (True, False) = GetCheckBoxValues((string)check.Tag);
                     if (check.CheckState == CheckState.Indeterminate) return null;
-                    return check.Checked ? "1" : "0";
-                case ComboBox cb: return cb.SelectedIndex == -1 ? null : $"{cb.SelectedIndex}";
+                    return check.Checked ? False : True;
+                case ComboBox cb:
+                    if (cb.SelectedIndex == -1)
+                        return null;
+                    var values = GetComboBoxValues((string)cb.Tag, cb.Items.Count);
+                    return values is null ?  $"{cb.SelectedIndex}":values[cb.SelectedIndex];
                 case NumericUpDown nb: return nb.Value < 0 ? null : $"{nb.Value}";
                 default: throw new NotImplementedException();
             }
@@ -77,20 +106,36 @@ namespace PCBS.UserControls
             switch (FindControl(command))
             {
                 case CheckBox check:
-                    if(value == "0" || value == "1")
+                    var (True, False) = GetCheckBoxValues((string)check.Tag);
+                    if (value == False || value == True)
                     {
-                        check.Checked = value == "1";
-                        break;
+                        check.Checked = value == True;
+                        return;
                     }
                     check.CheckState = CheckState.Indeterminate;
                     MessageBox.Show($"Не удалось получить текущее значение команды {command}", "", 0, MessageBoxIcon.Warning);
                     break;
                 case ComboBox cb:
                     {
-                        if (int.TryParse(value, out var d))
+                        var values = GetComboBoxValues((string)cb.Tag, cb.Items.Count);
+                        if(values is null)
                         {
-                            cb.SelectedIndex = d;
-                            break;
+                            if(int.TryParse(value, out var d))
+                            {
+                                cb.SelectedIndex = d;
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            for (var i = 0; i < values.Length; i++)
+                            {
+                                if (values[i] == value)
+                                {
+                                    cb.SelectedIndex = i;
+                                    return;
+                                }
+                            }
                         }
                     }
                     cb.SelectedIndex = -1;

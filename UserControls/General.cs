@@ -1,5 +1,6 @@
 ﻿using HidSharp;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace PCBS.UserControls
@@ -83,7 +84,25 @@ namespace PCBS.UserControls
         private void PullRawValue(object sender, EventArgs e) =>
             tbValueRaw.Text = MainForm.CurrentConnection?.Get(int.Parse(tbCodeRaw.Text));
 
-        private void SendCombinedCommand(object sender, EventArgs e) =>
-            MainForm.CurrentConnection?.Send(tbCombinedRequest.Text);
+        private void SendCombinedCommand(object sender, EventArgs e)
+        {
+            tbCombinedResponse.Clear();
+            var requests = tbCombinedRequest.Text.Split(';');
+            var responses = MainForm.CurrentConnection?.MultiSend(requests);
+            for(var i = 0; i < responses.Length; i++)
+            {
+                var resp = responses[i];
+                if (string.IsNullOrEmpty(resp))
+                {
+                    tbCombinedResponse.SelectionColor = Color.Red;
+                    tbCombinedResponse.AppendText($"ERR {requests[i]}\n");
+                }
+                else
+                {
+                    tbCombinedResponse.SelectionColor = Color.Black;
+                    tbCombinedResponse.AppendText($"OK {requests[i].Substring(0, 6)}: {resp}\n");
+                }
+            }
+        }
     }
 }

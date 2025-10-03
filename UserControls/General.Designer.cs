@@ -66,6 +66,7 @@
             this.cbConnPort = new System.Windows.Forms.ComboBox();
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.tbCombinedResponse = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // lblConnection
@@ -247,10 +248,20 @@
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.RefreshConnTypes);
             // 
+            // tbCombinedResponse
+            // 
+            this.tbCombinedResponse.Location = new System.Drawing.Point(9, 262);
+            this.tbCombinedResponse.Name = "tbCombinedResponse";
+            this.tbCombinedResponse.ReadOnly = true;
+            this.tbCombinedResponse.Size = new System.Drawing.Size(250, 174);
+            this.tbCombinedResponse.TabIndex = 22;
+            this.tbCombinedResponse.Text = "";
+            // 
             // General
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbCombinedResponse);
             this.Controls.Add(this.lblConnection);
             this.Controls.Add(this.lblSerial);
             this.Controls.Add(this.lblValueRaw);
@@ -280,5 +291,7 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.RichTextBox tbCombinedResponse;
     }
 }

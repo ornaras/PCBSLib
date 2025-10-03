@@ -118,9 +118,10 @@ namespace PCBS.UserControls
                 MessageBox.Show("Отсутствует подключение со сканером", "Не удалось выгрузить данные со сканера", 0, MessageBoxIcon.Hand);
                 return;
             }
-            for (var i = 0; i < cmds.Length; i++)
+            var response = MainForm.CurrentConnection.MultiSend(cmds.Select(c => $"{c}?").ToArray());
+            for (var i = 0; i < response.Length; i++)
             {
-                onDevice[i] = MainForm.CurrentConnection.Get(cmds[i]) ?? "";
+                onDevice[i] = response[i];
                 SetCurrentValue(cmds[i], onDevice[i]);
             }
             MessageBox.Show("Считывание завершено");

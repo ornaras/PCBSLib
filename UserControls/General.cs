@@ -53,8 +53,8 @@ namespace PCBS.UserControls
                 MainForm.CurrentConnection?.Dispose();
                 btn.Text = "Подключиться";
             }
-            tbSerial.Text = MainForm.CurrentConnection?.Get(811005) ?? "";
-            tbFirmware.Text = MainForm.CurrentConnection?.Get(809004) ?? "";
+            var resp = MainForm.CurrentConnection?.MultiSend(new string[] { "811005?", "809004?" }) ?? new string[2];
+            (tbSerial.Text, tbFirmware.Text) = (resp[0], resp[1]);
         }
 
         private void OnChangedConnType(object sender, EventArgs e) => RefreshConnTypes(sender, e);

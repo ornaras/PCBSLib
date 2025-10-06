@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace PCBS
@@ -63,7 +62,7 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private string[] SerialSend(string command)
+        private PCBSResult[] SerialSend(string command)
         {
             const int DEFAULT_SIZE_RESPONSE = 64;
             var data = GenerateFullRequest(command);
@@ -86,7 +85,7 @@ namespace PCBS
             return SplitResponse(encoding.GetString(data).Replace("\0", ""));
         }
 
-        private string[] HidSend(string command)
+        private PCBSResult[] HidSend(string command)
         {
             const int SIZE_ARRAYS = 64;
             const int COUNT_CHARACTERS = 61;
@@ -121,18 +120,11 @@ namespace PCBS
                 .Concat(encoding.GetBytes(req))
                 .Append((byte)0x2E).ToArray();
 
-        private static string[] SplitResponse(string raw)
+        private static PCBSResult[] SplitResponse(string raw)
         {
             if (!raw.EndsWith(".")) throw new FormatException("Ответ не целостен");
             var responses = raw.Substring(0, raw.Length - 1).Split(';');
-            return responses.Select(r =>
-            {
-                var match = Regex.Match(r, @"^\d{6}:? ?(?<value>[^\u0006]+)\u0006$");
-                if (!match.Success) return "";
-                var value = match.Groups["value"];
-                if (!value.Success || string.IsNullOrWhiteSpace(value.Value)) return "";
-                return value.Value;
-            }).ToArray();
+            return responses.Select(resp => new PCBSResult(resp)).ToArray();
         }
         #endregion
 
@@ -141,12 +133,9 @@ namespace PCBS
         /// <summary>
         /// Выполнение нескольких команд
         /// </summary>
-        /// <param name="commands">
-        /// Команды типа Send, Get и Get/Set.<br/>
-        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
-        /// </param>
+        /// <param name="commands">Команды</param>
         /// <returns>Ответы выполнений команд</returns>
-        public string[] MultiSend(string[] commands)
+        public PCBSResult[] MultiSend(IEnumerable<string> commands)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
@@ -160,16 +149,13 @@ namespace PCBS
         /// <summary>
         /// Выполнение команды
         /// </summary>
-        /// <param name="command">
-        /// Команда типа Send, Get и Get/Set.<br/>
-        /// <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso>
-        /// </param>
+        /// <param name="command">Команда</param>
         /// <param name="respSize">Размер ответ сканера</param>
         /// <returns>Ответ на выполнение команды</returns>
         /// <remarks>
-        /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
+        /// Для получения и установки значения кода рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
         /// </remarks>
-        public string Send(string command)
+        public PCBSResult Send(string command)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
@@ -183,16 +169,16 @@ namespace PCBS
         /// <summary>
         /// Установка значения команды
         /// </summary>
-        /// <param name="command">Команда типа Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <param name="code">Код с типом Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
         /// <returns>Присвоенное значение команды</returns>
-        public string Set(int command, string value) => Send($"{command}{value}");
+        public PCBSResult Set(int code, string value) => Send($"{code}{value}");
 
         /// <summary>
         /// Получить текущее значение команды
         /// </summary>
-        /// <param name="command">Команда типа Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <param name="code">Код с типом Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
         /// <returns>Значение команды</returns>
-        public string Get(int command) => Send($"{command}?");
+        public PCBSResult Get(int code) => Send($"{code}?");
         #endregion
 
         public override string ToString() => disposed ? "" : Address;
@@ -251,7 +237,7 @@ namespace PCBS
             try
             {
                 _dev = new PCBSDevice(dev);
-                if (_dev.Set(800001, "1") != "1")
+                if (_dev.Set(800001, "1").IsSuccess)
                     throw new Exception();
                 return _dev;
             }
@@ -272,7 +258,7 @@ namespace PCBS
             try
             {
                 device = new PCBSDevice(hidPath);
-                if (device.Set(800001, "1") != "1")
+                if (device.Set(800001, "1").IsSuccess)
                     throw new Exception();
             }
             catch
@@ -288,7 +274,7 @@ namespace PCBS
             try
             {
                 device = new PCBSDevice(comPort);
-                if (device.Set(800001, "1") != "1")
+                if (device.Set(800001, "1").IsSuccess)
                     throw new Exception();
             }
             catch

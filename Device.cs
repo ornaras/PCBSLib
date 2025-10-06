@@ -116,7 +116,7 @@ namespace PCBS
         #endregion
 
         #region Публичные методы обмена данными
-        public Result[] MultiSend(IEnumerable<string> commands)
+        public Result[] Send(IEnumerable<string> commands)
         {
             if (disposed) throw new ObjectDisposedException(nameof(Device));
             switch (_dev)

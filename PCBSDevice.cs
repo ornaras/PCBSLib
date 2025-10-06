@@ -27,12 +27,6 @@ namespace PCBS
         #endregion
 
         #region Конструкторы
-        public PCBSDevice(string hidDevicePath) :
-            this(DeviceList.Local.GetHidDevices().FirstOrDefault(dev => dev.DevicePath.EndsWith(hidDevicePath))) { }
-
-        public PCBSDevice(int comPort) :
-            this(DeviceList.Local.GetSerialDeviceOrNull($"COM{comPort}")) { }
-
         private PCBSDevice(Device device)
         {
             disposed = false;
@@ -204,36 +198,24 @@ namespace PCBS
             }
         }
 
-        public static bool TryConnect(string hidPath, out PCBSDevice device)
-        {
-            try
+        public static PCBSDevice CreateAsHid(string devicePath)
             {
-                device = new PCBSDevice(hidPath);
-                if (device.Set(800001, "1").IsSuccess)
-                    throw new Exception();
-            }
-            catch
-            {
-                device = null;
-                return false;
-            }
-            return true;
+            bool pred(HidDevice d) => d.DevicePath == $"/.//{devicePath}";
+            var hid = DeviceList.Local.GetHidDevices().FirstOrDefault(pred) 
+                ?? throw new ArgumentException();
+            var dev = new PCBSDevice(hid);
+            if (dev.Set(800001, "1").IsSuccess) return dev;
+            throw new InvalidDataException();
         }
 
-        public static bool TryConnect(int comPort, out PCBSDevice device)
-        {
-            try
+        public static PCBSDevice CreateAsCom(byte numberPort)
             {
-                device = new PCBSDevice(comPort);
-                if (device.Set(800001, "1").IsSuccess)
-                    throw new Exception();
-            }
-            catch
-            {
-                device = null;
-                return false;
-            }
-            return true;
+            bool pred(SerialDevice d) => d.DevicePath == $"/.//COM{numberPort}";
+            var com = DeviceList.Local.GetSerialDevices().FirstOrDefault(pred) 
+                ?? throw new ArgumentException();
+            var dev = new PCBSDevice(com);
+            if (dev.Set(800001, "1").IsSuccess) return dev;
+            throw new InvalidDataException();
         }
         #endregion
     }

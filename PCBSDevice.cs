@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace PCBS
@@ -34,6 +33,8 @@ namespace PCBS
         private bool disposed;
         private Stream _stream;
         private Device _dev;
+
+        private readonly Encoding encoding = Encoding.ASCII;
         #endregion
 
         #region Конструкторы
@@ -61,70 +62,106 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private string SerialSend(string command, int respSize)
+        private PCBSResult[] SerialSend(string command)
         {
-            var data = new byte[4 + command.Length];
-            var encoding = Encoding.ASCII;
-            data[0] = 0xFF;
-            data[1] = 0x4D;
-            data[2] = 0x0D;
-            data[data.Length - 1] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 3);
+            const int DEFAULT_SIZE_RESPONSE = 64;
+            var data = GenerateFullRequest(command);
             _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            try
+            data = new byte[DEFAULT_SIZE_RESPONSE];
+            var readed = 0;
+            do
             {
-                for (var i = 0; i < respSize; i++)
-                {
-                    var @byte = _stream.ReadByte();
-                    data[i] = (byte)@byte;
+                try { 
+                    for (; readed < data.Length; readed++)
+                    {
+                        var @byte = _stream.ReadByte();
+                        data[readed] = (byte)@byte;
+                    }
                 }
-            }
-            catch (TimeoutException) { }
-            var resp = encoding.GetString(data).Replace("\0", "");
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+                catch (TimeoutException) { }
+                if (data.Length > readed) break;
+                Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
+            } while (true);
+            return SplitResponse(encoding.GetString(data).Replace("\0", ""));
         }
 
-        private string HidSend(string command, int respSize)
+        private PCBSResult[] HidSend(string command)
         {
-            var data = new byte[64];
-            var encoding = Encoding.UTF8;
+            const int SIZE_ARRAYS = 64;
+            const int COUNT_CHARACTERS = 61;
+            var bytes = GenerateFullRequest(command);
+            var count = (int)Math.Ceiling(bytes.Length / (double)COUNT_CHARACTERS);
+            var data = new byte[SIZE_ARRAYS];
+            var dataResponse = new StringBuilder();
             data[0] = 0xFD;
-            data[1] = (byte)(1 + command.Length);
-            data[2] = 0xFF;
-            data[3] = 0x4D;
-            data[4] = 0x0D;
-            data[command.Length + 5] = 0x2E;
-            encoding.GetBytes(command).CopyTo(data, 5);
-            _stream.Write(data, 0, data.Length);
-            data = new byte[respSize];
-            _ = _stream.Read(data, 0, data.Length);
-            var resp = encoding.GetString(data).Replace("\0", "").Substring(2);
-            var match = Regex.Match(resp, @"^\d{6}:? ?(?<resp>.+)\u0006\.?$");
-            return match.Groups["resp"].Value;
+            for (var y = 0; y < count; y++)
+            {
+                var dataSize = Math.Min(bytes.Length - (y * COUNT_CHARACTERS), COUNT_CHARACTERS);
+                data[1] = (byte)dataSize;
+                data[SIZE_ARRAYS - 1] = (byte)(y == count - 1 ? 0 : 1);
+                for (var i = 0; i <= COUNT_CHARACTERS; i++)
+                    data[i + 2] = 0;
+                for (var x = 0; x < dataSize; x++)
+                    data[x + 2] = bytes[y * COUNT_CHARACTERS + x];
+                _stream.Write(data, 0, data.Length);
+            }
+            do
+            {
+                var _resp = new byte[SIZE_ARRAYS];
+                try { _ = _stream.Read(_resp, 0, SIZE_ARRAYS); }
+                catch (TimeoutException) { break; }
+                dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
+            } while (true);
+            return SplitResponse(dataResponse.ToString());
+        }
+
+        private byte[] GenerateFullRequest(string req) => 
+            new byte[3] { 0xFF, 0x4D, 0x0D }
+                .Concat(encoding.GetBytes(req))
+                .Append((byte)0x2E).ToArray();
+
+        private static PCBSResult[] SplitResponse(string raw)
+        {
+            if (!raw.EndsWith(".")) throw new FormatException("Ответ не целостен");
+            var responses = raw.Substring(0, raw.Length - 1).Split(';');
+            return responses.Select(resp => new PCBSResult(resp)).ToArray();
         }
         #endregion
 
         #region Публичные методы обмена данными
 
         /// <summary>
-        /// Выполнение команды
+        /// Выполнение нескольких команд
         /// </summary>
-        /// <param name="command">Команда типа Send, Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
-        /// <param name="respSize">Размер ответа сканера</param>
-        /// <returns>Ответ на выполнение команды</returns>
-        /// <remarks>
-        /// Для получения и установки значения команды рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
-        /// </remarks>
-        /// 
-        public string Send(string command, int respSize = 64)
+        /// <param name="commands">Команды</param>
+        /// <returns>Ответы выполнений команд</returns>
+        public PCBSResult[] MultiSend(IEnumerable<string> commands)
         {
             if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
             switch (_dev)
             {
-                case SerialDevice _: return SerialSend(command, respSize);
-                case HidDevice _: return HidSend(command, respSize);
+                case SerialDevice _: return SerialSend(string.Join(";", commands));
+                case HidDevice _: return HidSend(string.Join(";", commands));
+                default: throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Выполнение команды
+        /// </summary>
+        /// <param name="command">Команда</param>
+        /// <param name="respSize">Размер ответ сканера</param>
+        /// <returns>Ответ на выполнение команды</returns>
+        /// <remarks>
+        /// Для получения и установки значения кода рекомендуется использовать<br/>методы <see cref="Get"/> и <see cref="Set"/> соответственно.
+        /// </remarks>
+        public PCBSResult Send(string command)
+        {
+            if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
+            switch (_dev)
+            {
+                case SerialDevice _: return SerialSend(command)[0];
+                case HidDevice _: return HidSend(command)[0];
                 default: throw new NotSupportedException();
             }
         }
@@ -132,16 +169,16 @@ namespace PCBS
         /// <summary>
         /// Установка значения команды
         /// </summary>
-        /// <param name="command">Команда типа Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <param name="code">Код с типом Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
         /// <returns>Присвоенное значение команды</returns>
-        public string Set(int command, string value) => Send($"{command}{value}");
+        public PCBSResult Set(int code, string value) => Send($"{code}{value}");
 
         /// <summary>
         /// Получить текущее значение команды
         /// </summary>
-        /// <param name="command">Команда типа Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
+        /// <param name="code">Код с типом Get и Get/Set. <seealso href="https://github.com/ornaras/PCBSLib/blob/main/README.md#%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B">Список всех доступных команд.</seealso></param>
         /// <returns>Значение команды</returns>
-        public string Get(int command) => Send($"{command}?");
+        public PCBSResult Get(int code) => Send($"{code}?");
         #endregion
 
         public override string ToString() => disposed ? "" : Address;
@@ -200,8 +237,9 @@ namespace PCBS
             try
             {
                 _dev = new PCBSDevice(dev);
-                var resp = _dev.Set(800001, "1");
-                return resp == "1" ? _dev : null;
+                if (_dev.Set(800001, "1").IsSuccess)
+                    throw new Exception();
+                return _dev;
             }
             catch (Exception e)
             {
@@ -213,6 +251,38 @@ namespace PCBS
                 if (!(locker is null))
                     Monitor.Exit(locker);
             }
+        }
+
+        public static bool TryConnect(string hidPath, out PCBSDevice device)
+        {
+            try
+            {
+                device = new PCBSDevice(hidPath);
+                if (device.Set(800001, "1").IsSuccess)
+                    throw new Exception();
+            }
+            catch
+            {
+                device = null;
+                return false;
+            }
+            return true;
+        }
+
+        public static bool TryConnect(int comPort, out PCBSDevice device)
+        {
+            try
+            {
+                device = new PCBSDevice(comPort);
+                if (device.Set(800001, "1").IsSuccess)
+                    throw new Exception();
+            }
+            catch
+            {
+                device = null;
+                return false;
+            }
+            return true;
         }
         #endregion
     }

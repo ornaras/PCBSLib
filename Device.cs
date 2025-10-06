@@ -214,7 +214,7 @@ namespace PCBS
         {
             bool pred(HidDevice d) => d.DevicePath == $@"\\?\{devicePath}";
             var hid = DeviceList.Local.GetHidDevices().FirstOrDefault(pred) 
-                ?? throw new ArgumentException();
+                ?? throw new ArgumentException("Не удалось найти устройство по данному пути");
             var dev = new Device(hid);
             if (dev.Set(800001, "1").IsSuccess) return dev;
             throw new InvalidDataException();
@@ -223,8 +223,8 @@ namespace PCBS
         public static Device CreateAsCom(byte numberPort)
         {
             bool pred(SerialDevice d) => d.DevicePath == $@"\\?\COM{numberPort}";
-            var com = DeviceList.Local.GetSerialDevices().FirstOrDefault(pred) 
-                ?? throw new ArgumentException();
+            var com = DeviceList.Local.GetSerialDevices().FirstOrDefault(pred)
+                ?? throw new ArgumentException("Не удалось найти устройство по данному пути");
             var dev = new Device(com);
             if (dev.Set(800001, "1").IsSuccess) return dev;
             throw new InvalidDataException();

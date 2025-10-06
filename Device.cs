@@ -195,7 +195,7 @@ namespace PCBS
             {
                 _dev = new Device(dev);
                 if (!_dev.Set(800001, "1").IsSuccess)
-                    throw new Exception();
+                    throw new InvalidDataException();
                 return _dev;
             }
             catch (Exception)

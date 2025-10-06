@@ -1,19 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Authors>ornaras</Authors>
 		<RootNamespace>PCBS</RootNamespace>
-		<Version>2.1</Version>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>2.2</Version>
 		<RepositoryUrl>https://github.com/ornaras/PCBSLib</RepositoryUrl>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutputType>Library</OutputType>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageIcon>res\logo-NuGet.png</PackageIcon>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
 	  <None Remove="res\logo-ReadMe.png" />
 	</ItemGroup>

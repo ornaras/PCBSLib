@@ -1,7 +1,4 @@
 # PCBSLib
-
-<img src="res/logo-ReadMe.png" align="right" alt="logo" width="180" height="90">
-
 > Библиотека для управления сканерами POScenter
 
 [![wakatime](https://wakatime.com/badge/user/cb1d81a4-cf38-4b2f-a98a-4e569f87e13b/project/099b9ddc-99cf-4529-87dd-01a75bc1b762.svg)](https://wakatime.com/@ornaras/projects/bjxisvfshg)

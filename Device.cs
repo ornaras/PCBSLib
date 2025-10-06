@@ -12,7 +12,7 @@ namespace PCBS
 {
     public delegate object GetLocker(string path);
 
-    public class PCBSDevice : IDisposable
+    public class Device : IDisposable
     {
         #region Свойства
         public string Address => _dev.DevicePath.Substring(4);
@@ -21,13 +21,13 @@ namespace PCBS
         #region Переменные
         private bool disposed;
         private Stream _stream;
-        private Device _dev;
+        private HidSharp.Device _dev;
 
         private readonly Encoding encoding = Encoding.ASCII;
         #endregion
 
         #region Конструкторы
-        private PCBSDevice(Device device)
+        private Device(HidSharp.Device device)
         {
             disposed = false;
             _dev = device;
@@ -37,7 +37,7 @@ namespace PCBS
         #endregion
 
         #region Внутренние методы обмена данными
-        private PCBSResult[] SerialSend(string command)
+        private Result[] SerialSend(string command)
         {
             const int DEFAULT_SIZE_RESPONSE = 64;
             var data = GenerateRequest(command);
@@ -60,7 +60,7 @@ namespace PCBS
             return ParseResponses(encoding.GetString(data).Replace("\0", ""));
         }
 
-        private PCBSResult[] HidSend(string command)
+        private Result[] HidSend(string command)
         {
             const int SIZE_ARRAYS = 64;
             const int COUNT_CHARACTERS = 61;
@@ -107,18 +107,18 @@ namespace PCBS
                 .Concat(encoding.GetBytes(req))
                 .Append((byte)0x2E).ToArray();
 
-        private static PCBSResult[] ParseResponses(string raw)
+        private static Result[] ParseResponses(string raw)
         {
             if (!raw.EndsWith(".")) throw new FormatException("Ответ не целостен");
             var responses = raw.Substring(0, raw.Length - 1).Split(';');
-            return responses.Select(resp => new PCBSResult(resp)).ToArray();
+            return responses.Select(resp => new Result(resp)).ToArray();
         }
         #endregion
 
         #region Публичные методы обмена данными
-        public PCBSResult[] MultiSend(IEnumerable<string> commands)
+        public Result[] MultiSend(IEnumerable<string> commands)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
+            if (disposed) throw new ObjectDisposedException(nameof(Device));
             switch (_dev)
             {
                 case SerialDevice _: return SerialSend(string.Join(";", commands));
@@ -127,9 +127,9 @@ namespace PCBS
             }
         }
 
-        public PCBSResult Send(string command)
+        public Result Send(string command)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(PCBSDevice));
+            if (disposed) throw new ObjectDisposedException(nameof(Device));
             switch (_dev)
             {
                 case SerialDevice _: return SerialSend(command)[0];
@@ -138,9 +138,9 @@ namespace PCBS
             }
         }
 
-        public PCBSResult Set(int code, string value) => Send($"{code}{value}");
+        public Result Set(int code, string value) => Send($"{code}{value}");
 
-        public PCBSResult Get(int code) => Send($"{code}?");
+        public Result Get(int code) => Send($"{code}?");
         #endregion
 
         public override string ToString() => disposed ? "" : Address;
@@ -152,7 +152,7 @@ namespace PCBS
             GC.SuppressFinalize(this);
         }
 
-        ~PCBSDevice()
+        ~Device()
         {
             Dispose(false);
         }
@@ -173,27 +173,27 @@ namespace PCBS
         #endregion
 
         #region Статические методы
-        public static IEnumerable<PCBSDevice> Discover(GetLocker getLocker = null)
+        public static IEnumerable<Device> Discover(GetLocker getLocker = null)
         {
             var devList = DeviceList.Local;
             var devFilter = new DeviceFilter(d => d is HidDevice || d is SerialDevice);
             var devices = devList.GetAllDevices(devFilter);
             foreach (var dev in devices)
             {
-                if (TryConnect(dev, getLocker) is PCBSDevice pcbs) 
+                if (TryConnect(dev, getLocker) is Device pcbs) 
                     yield return pcbs;
             }
         }
 
-        private static PCBSDevice TryConnect(Device dev, GetLocker getLocker)
+        private static Device TryConnect(HidSharp.Device dev, GetLocker getLocker)
         {
             var locker = getLocker?.Invoke(dev.DevicePath);
-            if (!(locker is null))
+            if (!(locker is null)) 
                 Monitor.Enter(locker);
-            PCBSDevice _dev = null;
+            Device _dev = null;
             try
             {
-                _dev = new PCBSDevice(dev);
+                _dev = new Device(dev);
                 if (!_dev.Set(800001, "1").IsSuccess)
                     throw new Exception();
                 return _dev;
@@ -210,22 +210,22 @@ namespace PCBS
             }
         }
 
-        public static PCBSDevice CreateAsHid(string devicePath)
-            {
+        public static Device CreateAsHid(string devicePath)
+        {
             bool pred(HidDevice d) => d.DevicePath == $"/.//{devicePath}";
             var hid = DeviceList.Local.GetHidDevices().FirstOrDefault(pred) 
                 ?? throw new ArgumentException();
-            var dev = new PCBSDevice(hid);
+            var dev = new Device(hid);
             if (dev.Set(800001, "1").IsSuccess) return dev;
             throw new InvalidDataException();
         }
 
-        public static PCBSDevice CreateAsCom(byte numberPort)
-            {
+        public static Device CreateAsCom(byte numberPort)
+        {
             bool pred(SerialDevice d) => d.DevicePath == $"/.//COM{numberPort}";
             var com = DeviceList.Local.GetSerialDevices().FirstOrDefault(pred) 
                 ?? throw new ArgumentException();
-            var dev = new PCBSDevice(com);
+            var dev = new Device(com);
             if (dev.Set(800001, "1").IsSuccess) return dev;
             throw new InvalidDataException();
         }

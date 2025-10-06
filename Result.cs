@@ -1,6 +1,6 @@
 ﻿namespace PCBS
 {
-    public readonly struct PCBSResult
+    public readonly struct Result
     {
         const string SUCCESS_MARK = "\u0006";
 
@@ -11,7 +11,7 @@
         public string Value => Command.Substring(6);
         public int ValueInt => int.Parse(Value);
 
-        public PCBSResult(string response)
+        public Result(string response)
         {
             IsSuccess = response.EndsWith(SUCCESS_MARK);
             Command = response.Replace(SUCCESS_MARK, "");

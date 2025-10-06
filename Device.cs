@@ -212,7 +212,7 @@ namespace PCBS
 
         public static Device CreateAsHid(string devicePath)
         {
-            bool pred(HidDevice d) => d.DevicePath == $"/.//{devicePath}";
+            bool pred(HidDevice d) => d.DevicePath == $@"\\?\{devicePath}";
             var hid = DeviceList.Local.GetHidDevices().FirstOrDefault(pred) 
                 ?? throw new ArgumentException();
             var dev = new Device(hid);
@@ -222,7 +222,7 @@ namespace PCBS
 
         public static Device CreateAsCom(byte numberPort)
         {
-            bool pred(SerialDevice d) => d.DevicePath == $"/.//COM{numberPort}";
+            bool pred(SerialDevice d) => d.DevicePath == $@"\\?\COM{numberPort}";
             var com = DeviceList.Local.GetSerialDevices().FirstOrDefault(pred) 
                 ?? throw new ArgumentException();
             var dev = new Device(com);

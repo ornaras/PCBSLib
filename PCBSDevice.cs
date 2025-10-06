@@ -40,7 +40,7 @@ namespace PCBS
         private PCBSResult[] SerialSend(string command)
         {
             const int DEFAULT_SIZE_RESPONSE = 64;
-            var data = GenerateFullRequest(command);
+            var data = GenerateRequest(command);
             _stream.Write(data, 0, data.Length);
             data = new byte[DEFAULT_SIZE_RESPONSE];
             var readed = 0;
@@ -57,14 +57,14 @@ namespace PCBS
                 if (data.Length > readed) break;
                 Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
             } while (true);
-            return SplitResponse(encoding.GetString(data).Replace("\0", ""));
+            return ParseResponses(encoding.GetString(data).Replace("\0", ""));
         }
 
         private PCBSResult[] HidSend(string command)
         {
             const int SIZE_ARRAYS = 64;
             const int COUNT_CHARACTERS = 61;
-            var bytes = GenerateFullRequest(command);
+            var bytes = GenerateRequest(command);
             var count = (int)Math.Ceiling(bytes.Length / (double)COUNT_CHARACTERS);
             var data = new byte[SIZE_ARRAYS];
             var dataResponse = new StringBuilder();
@@ -87,15 +87,15 @@ namespace PCBS
                 catch (TimeoutException) { break; }
                 dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
             } while (true);
-            return SplitResponse(dataResponse.ToString());
+            return ParseResponses(dataResponse.ToString());
         }
 
-        private byte[] GenerateFullRequest(string req) => 
+        private byte[] GenerateRequest(string req) => 
             new byte[3] { 0xFF, 0x4D, 0x0D }
                 .Concat(encoding.GetBytes(req))
                 .Append((byte)0x2E).ToArray();
 
-        private static PCBSResult[] SplitResponse(string raw)
+        private static PCBSResult[] ParseResponses(string raw)
         {
             if (!raw.EndsWith(".")) throw new FormatException("Ответ не целостен");
             var responses = raw.Substring(0, raw.Length - 1).Split(';');

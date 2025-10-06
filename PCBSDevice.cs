@@ -182,11 +182,11 @@ namespace PCBS
             try
             {
                 _dev = new PCBSDevice(dev);
-                if (_dev.Set(800001, "1").IsSuccess)
+                if (!_dev.Set(800001, "1").IsSuccess)
                     throw new Exception();
                 return _dev;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _dev?.Dispose();
                 return null;

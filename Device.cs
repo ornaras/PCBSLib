@@ -32,7 +32,8 @@ namespace PCBS
             disposed = false;
             _dev = device;
             _stream = _dev.Open();
-            _stream.WriteTimeout = _stream.ReadTimeout = 1000;
+            _stream.WriteTimeout = 1000;
+            _stream.ReadTimeout = 50;
         }
         #endregion
 

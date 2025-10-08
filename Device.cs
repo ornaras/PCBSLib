@@ -3,6 +3,7 @@
 using HidSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -54,7 +55,12 @@ namespace PCBS
                         data[readed] = (byte)@byte;
                     }
                 }
-                catch (TimeoutException) { }
+                catch (Exception e)
+                {
+                    if (e is IOException && e.InnerException is Win32Exception ex && ex.ErrorCode == -2147467259)
+                        return new Result[1] { new Result($"{command.Split(';')[0]}\u0006") };
+                    else if (!(e is TimeoutException)) throw;
+                }
                 if (data.Length > readed) break;
                 Array.Resize(ref data, data.Length + DEFAULT_SIZE_RESPONSE);
             } while (true);
@@ -96,8 +102,17 @@ namespace PCBS
             do
             {
                 var _resp = new byte[SIZE_ARRAYS];
-                try { _ = _stream.Read(_resp, 0, SIZE_ARRAYS); }
-                catch (TimeoutException) { break; }
+                try 
+                { 
+                    _ = _stream.Read(_resp, 0, SIZE_ARRAYS); 
+                }
+                catch(Exception e)
+                {
+                    if (e is TimeoutException) break;
+                    else if (e is IOException && e.InnerException is Win32Exception ex && ex.ErrorCode == -2147467259)
+                        return new Result[1] { new Result($"{command.Split(';')[0]}\u0006") };
+                    throw;
+                }
                 dataResponse.Append(encoding.GetString(_resp.Skip(5).Take(_resp[1]).ToArray()));
             } while (true);
             return ParseResponses(dataResponse.ToString());
